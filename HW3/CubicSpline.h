@@ -4,12 +4,12 @@
 using namespace std;
 
 template <class type>
-class CubicSpine {
+class CubicSpline {
 private:
 	int n;
 	vector <type> x, f, m, M;	// 结点, 函数值, 一阶导, 二阶导
 public:
-	CubicSpine(const vector<type>& x, const vector<type>& f, const type& m0, const type& mn) : x(x), f(f) {
+	CubicSpline(const vector<type>& x, const vector<type>& f, const type& m0, const type& mn) : x(x), f(f) {
 		n = x.size() - 1;
 		m.resize(n+1);
 		M.resize(n+1);
@@ -59,9 +59,9 @@ public:
 };
 
 template <class type>
-CubicSpine<type> CubicSpineInterpolation(const Function <type>& f, const type& l, const type& r, const int& n) {
+CubicSpline<type> CubicSplineInterpolation(const Function <type>& f, const type& l, const type& r, const int& n) {
 	vector <type> x(n+1), y(n+1);
 	for(int i = 0; i <= n; ++ i) x[i] = l + (r - l) / n * i, y[i] = f(x[i]);
 	type m0 = f.d(l), mn = f.d(r);
-	return CubicSpine<type>(x, y, m0, mn);
+	return CubicSpline<type>(x, y, m0, mn);
 }
