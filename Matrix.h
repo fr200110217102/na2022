@@ -119,7 +119,7 @@ ostream & operator << (ostream & out, const Matrix <T> & a) {
 	int n = a.row(), m = a.col();
 	for(int i = 0; i < n; ++ i, cout<< '\n')
 		for(int j = 0; j < m; ++ j)
-			out << fixed << setprecision(6) << a[i][j] << ' ';
+			out << a[i][j] << ' ';
 	return out;
 }
 
@@ -549,7 +549,7 @@ Colvec <T> Jacobi(const Matrix <T> & a, const Colvec <T> & b, const T & eps) {
 			now[i] /= -a[i][i];
 		}
 	}while(vert_2(last - now) >= eps);
-	cout << "times = " << times << endl;
+	// cout << "times = " << times << endl;
 	return now;
 }
 
@@ -570,7 +570,7 @@ Colvec <T> Gauss_Seidel(const Matrix <T> & a, const Colvec <T> & b, const T & ep
 			now[i] /= -a[i][i];
 		}
 	}while(vert_2(last - now) >= eps);
-	cout << "times = " << times << endl;
+	// cout << "times = " << times << endl;
 	return now;
 }
 
@@ -592,7 +592,7 @@ Colvec <T> SOR(const Matrix <T> & a, const Colvec <T> & b, const T & w, const T 
 			now[i] += (1-w) * last[i];
 		}
 	}while(vert_2(last - now) >= eps);
-	cout << "times = " << times << endl;
+	// cout << "times = " << times << endl;
 	return now;
 }
 
@@ -617,7 +617,7 @@ Colvec <T> CG(const Matrix <T> & a, const Colvec <T> & b, const T & eps = 1e-12,
 		lastrho = rho;
 		rho = (~r) * r;
 	}
-	cout << "times = " << times << endl;
+	// cout << "times = " << times << endl;
 	return x;
 }
 
@@ -724,7 +724,7 @@ Matrix <T> Schur(Matrix <T> & a, const T & eps = 1e-12) {
 		update(a, h22, l, r, l, r);
 		++ times;
 	}
-	cout << "times = " << times << endl;
+	// cout << "times = " << times << endl;
 	return Q;
 }
 
@@ -828,7 +828,7 @@ Matrix <T> Symmetric_Diagnize(Matrix <T> & a, const T eps = 1e-12) {
 		update(a, t22, l, r, l, r);
 		++ times;
 	}
-	cout << "times = " << times << endl;
+	// cout << "times = " << times << endl;
 	return Q;
 }
 
@@ -864,10 +864,9 @@ Matrix <T> Jacobi_Diagnize(Matrix <T> & a, const T eps1 = 1e-10, const T eps2 = 
 		for (int i = 0; i < n; ++ i)
 			for (int j = 0; j < n; ++ j) if(i != j)
 				sum += a[i][j] * a[i][j];
-		cout << sum << endl;
 		if (sum < eps1 * n) break;
 	}
-	cout << "times = " << times << endl;
+	// cout << "times = " << times << endl;
 	return Q;
 }
 
