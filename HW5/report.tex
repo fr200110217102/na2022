@@ -5,7 +5,7 @@
 \usepackage{amssymb}
 \usepackage{enumitem}
 
-\title{report5}
+\title{数值分析 - 第五次实验报告}
 \author{强基数学2001班 樊睿 3200102142}
 \date{December 11,2022}
 
@@ -13,8 +13,10 @@
 
 \maketitle
 
-\section{摘要}
+\begin{abstract}
 本项目实现了对平面上 $n$ 个点用 $m$ 次多项式进行最小二乘拟合，并分析解决了一个实际例子。
+\end{abstract}
+
 
 \section{离散最小二乘拟合（DLS）}
 
@@ -52,7 +54,7 @@
 \item 计算 $A=(x_i^j)_{n\times (m+1)}$。
 \item 令 $b=(y_i)_{m+1}$。
 \item 对 $A$ 进行 QR 分解 $A=QR$。
-\item 解方程 $R_1a=Q^Tb$，其中 $R_i$ 为 $R$ 的前 $m+1$ 行。
+\item 解方程 $R_1a=Q^Tb$，其中 $R_1$ 为 $R$ 的前 $m+1$ 行。
 \item 返回多项式 $\sum_{i=0}^ma_ix^i$。
 \end{itemize}
 
@@ -222,6 +224,35 @@ int main(){
 
 对于 B 题中的数据，两种方法输出了同样的拟合多项式 $2.17572 +2.67041x -0.238444x^2$。
 
+最小二乘曲线和数据点的分布如下：
+
+\begin{figure}[h]
+    \begin{minipage}{4cm}
+	\includegraphics[width = 12cm, height = 8cm]{1.png}
+	\label{fig1}
+	\end{minipage}
+\end{figure}
+
+附作图程序：
+
+\begin{verbatim}
+import matplotlib.pyplot as plt
+import numpy as np
+
+def f(x):
+    return 2.17572 +2.67041*x -0.238444*x**2
+
+xs = [0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10]
+ys = [2.9,2.7,4.8,5.3,7.1,7.6,7.7,7.6,9.4,9.0,9.6,10.0,10.2,9.7,8.3,8.4,9.0,8.3,6.6,6.7,4.1]
+plt.scatter(xs, ys)
+
+x = np.linspace(0, 10, 1000)
+y = [f(t) for t in x]
+plt.plot(x, y)
+
+plt.show()
+\end{verbatim}
+
 正则方程组中，
 \begin{equation}
 G=
@@ -232,7 +263,7 @@ G=
 \end{bmatrix}
 \end{equation}
 
-特征值为 $45851,761.682,707.566$，二范数下条件数为 $64.8011$。
+用 QR 方法（详见 \verb|Matrix.h|）求得特征值为 $45851,761.682,707.566$，二范数下条件数为 $64.8011$。
 
 正交分解法中，
 
@@ -245,7 +276,7 @@ R_1=
 \end{bmatrix}
 \end{equation}
 
-特征值为 $37.4438,13.8744,4.58258$，二范数下条件数为 $8.17092$。
+$R_1$ 是上三角阵，因此特征值就是对角元。为 $37.4438,13.8744,4.58258$，二范数下条件数为 $8.17092$。
 
 矩阵的条件数反映了方程组的稳定性，进而反映了算法的稳定性。因此，正交分解的稳定性比正则化方程组要好。
 

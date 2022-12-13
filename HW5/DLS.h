@@ -9,6 +9,7 @@ private:
 	Polynomial <type> p;
 public:
 	DLS(vector<type>& x,vector<type>& y,int m,string method="Normal"){
+		if(x.size()!=y.size())throw "Invalid Initial!";
 		if(method!="Normal"&&method!="QR")throw "Invalid Method!";
 		int n=x.size();
 		p.resize(m+1);
