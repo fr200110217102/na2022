@@ -45,10 +45,10 @@ public:
 			for(int i=0;i<=m;++i)p[i]=sol[i];
 			/*答题用，使用时注释掉*/
 			cout<<G<<endl;
-			Symmetric_Diagnize(G);
+			Jacobi_Diagnize(G);
 			vector<type> eig(m+1);
 			for(int i=0;i<=m;++i)eig[i]=fabs(G[i][i]),cout<<eig[i]<<' ';
-			cout<<*max_element(eig.begin(),eig.end()) / *min_element(eig.begin(),eig.end())<<endl<<endl;
+			cout<<*max_element(eig.begin(),eig.end())<<endl<<endl;
 			/**/
 		}
 		else if(method=="QR"){
@@ -62,14 +62,17 @@ public:
 			for(int i=0;i<n;++i)b[i]=y[i];
 			pair<Matrix<type>,Colvec<type>> qr=QR(A);
 			/*答题用，使用时注释掉*/
+			Matrix<type> R(m+1,m+1);
 			for(int i=0;i<=m;++i){
-				for(int j=0;j<i;++j)cout<<0<<' ';
-				for(int j=i;j<=m;++j)cout<<qr.first[i][j]<<' ';
-				cout<<'\n';
+				for(int j=0;j<i;++j)R[i][j]=0;
+				for(int j=i;j<=m;++j)R[i][j]=qr.first[i][j];
 			}
+			cout<<R<<endl;
+			R=~R*R;
+			Jacobi_Diagnize(R);
 			vector<type> eig(m+1);
-			for(int i=0;i<=m;++i)eig[i]=fabs(qr.first[i][i]),cout<<eig[i]<<' ';
-			cout<<*max_element(eig.begin(),eig.end()) / *min_element(eig.begin(),eig.end())<<endl<<endl;
+			for(int i=0;i<=m;++i)eig[i]=fabs(R[i][i]),cout<<eig[i]<<' ';
+			cout<<sqrt(*max_element(eig.begin(),eig.end()))<<endl;
 			/**/
 			pair<Colvec<type>,type> sol=QR_LS(A,b);
 			for(int i=0;i<=m;++i)p[i]=sol.first[i];

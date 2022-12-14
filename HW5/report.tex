@@ -45,7 +45,7 @@
 \item 预处理 $X_t=\sum_{i=0}^{n-1}x_i^t,0\leq t\leq 2m$。
 \item 预处理 $Y_t=\sum_{i=0}^{n-1}x_y^ty,0\leq t\leq m$。
 \item 则 $<x^i,x^j>=X_{i+j},<x^i,y>=Y_i(0\leq i\leq m,0\leq j\leq m)$。
-\item 解线性方程组 $Ga=b$，其中 $G=(<x^i,x^j)_{(m+1)\times (m+1)}>,b=(<x^i,y>)_{m+1}$。
+\item 解线性方程组 $Ga=b$，其中 $G=(<x^i,x^j>)_{(m+1)\times (m+1)},b=(<x^i,y>)_{m+1}$。
 \item 返回多项式 $\sum_{i=0}^ma_ix^i$。
 \end{itemize}
 
@@ -71,79 +71,79 @@ using namespace std;
 template<class type>
 class DLS{
 private:
-    Polynomial <type> p;
+	Polynomial <type> p;
 public:
-    DLS(vector<type>& x,vector<type>& y,int m,string method="Normal"){
-        if(method!="Normal"&&method!="QR")throw "Invalid Method!";
-        int n=x.size();
-        p.resize(m+1);
-        if(method=="Normal"){
-            vector<vector<type>> px(2*m+1),py(m+1);
-            vector<type> pxs(2*m+1),pys(m+1);
-            Matrix<type> G(m+1,m+1);
-            Colvec<type> c(m+1),sol;
-            px[0].resize(n);
-            for(int i=0;i<n;++i)px[0][i]=1;
-            pxs[0]=n;
-            for(int i=1;i<=2*m;++i){
-                px[i].resize(n);
-                for(int j=0;j<n;++j){
-                    px[i][j]=px[i-1][j]*x[j];
-                    pxs[i]+=px[i][j];
-                }
-            }
-            py[0].resize(n);
-            for(int i=0;i<n;++i)py[0][i]=y[i],pys[0]+=y[i];
-            for(int i=1;i<=m;++i){
-                py[i].resize(n);
-                for(int j=0;j<n;++j){
-                    py[i][j]=py[i-1][j]*x[j];
-                    pys[i]+=py[i][j];
-                }
-            }
-            for(int i=0;i<=m;++i)
-                for(int j=0;j<=m;++j)
-                    G[i][j]=pxs[i+j];
-            for(int i=0;i<=m;++i)c[i]=pys[i];
-            sol=Gauss_Improved_Solve(G,c);
-            for(int i=0;i<=m;++i)p[i]=sol[i];
-            /*答题用，使用时注释掉*/
-            /*
-            cout<<G<<endl;
-            Symmetric_Diagnize(G);
-            vector<type> eig(m+1);
-            for(int i=0;i<=m;++i)eig[i]=fabs(G[i][i]);
-            cout<<*max_element(eig.begin(),eig.end()) / *min_element(eig.begin(),eig.end())<<endl<<endl;
-            */
-            /**/
-        }
-        else if(method=="QR"){
-            p.resize(m+1);
-            Matrix<type> A(n,m+1);
-            Colvec<type> b(n);
-            for(int i=0;i<n;++i){
-                A[i][0]=1;
-                for(int j=1;j<=m;++j)A[i][j]=A[i][j-1]*x[i];
-            }
-            for(int i=0;i<n;++i)b[i]=y[i];
-            pair<Matrix<type>,Colvec<type>> qr=QR(A);
-            /*答题用，使用时注释掉*/
-            /*
-            for(int i=0;i<=m;++i){
-                for(int j=0;j<i;++j)cout<<0<<' ';
-                for(int j=i;j<=m;++j)cout<<qr.first[i][j]<<' ';
-                cout<<'\n';
-            }
-            vector<type> eig(m+1);
-            for(int i=0;i<=m;++i)eig[i]=fabs(qr.first[i][i]);
-            cout<<*max_element(eig.begin(),eig.end()) / *min_element(eig.begin(),eig.end())<<endl<<endl;
-            */
-            /**/
-            pair<Colvec<type>,type> sol=QR_LS(A,b);
-            for(int i=0;i<=m;++i)p[i]=sol.first[i];
-        }
-    }
-    Polynomial<type> getpoly(){return p;}
+	DLS(vector<type>& x,vector<type>& y,int m,string method="Normal"){
+		if(x.size()!=y.size())throw "Invalid Initial!";
+		if(method!="Normal"&&method!="QR")throw "Invalid Method!";
+		int n=x.size();
+		p.resize(m+1);
+		if(method=="Normal"){
+			vector<vector<type>> px(2*m+1),py(m+1);
+			vector<type> pxs(2*m+1),pys(m+1);
+			Matrix<type> G(m+1,m+1);
+			Colvec<type> c(m+1),sol;
+			px[0].resize(n);
+			for(int i=0;i<n;++i)px[0][i]=1;
+			pxs[0]=n;
+			for(int i=1;i<=2*m;++i){
+				px[i].resize(n);
+				for(int j=0;j<n;++j){
+					px[i][j]=px[i-1][j]*x[j];
+					pxs[i]+=px[i][j];
+				}
+			}
+			py[0].resize(n);
+			for(int i=0;i<n;++i)py[0][i]=y[i],pys[0]+=y[i];
+			for(int i=1;i<=m;++i){
+				py[i].resize(n);
+				for(int j=0;j<n;++j){
+					py[i][j]=py[i-1][j]*x[j];
+					pys[i]+=py[i][j];
+				}
+			}
+			for(int i=0;i<=m;++i)
+				for(int j=0;j<=m;++j)
+					G[i][j]=pxs[i+j];
+			for(int i=0;i<=m;++i)c[i]=pys[i];
+			sol=Gauss_Improved_Solve(G,c);
+			for(int i=0;i<=m;++i)p[i]=sol[i];
+			/*答题用，使用时注释掉*/
+			cout<<G<<endl;
+			Jacobi_Diagnize(G);
+			vector<type> eig(m+1);
+			for(int i=0;i<=m;++i)eig[i]=fabs(G[i][i]),cout<<eig[i]<<' ';
+			cout<<*max_element(eig.begin(),eig.end())<<endl<<endl;
+			/**/
+		}
+		else if(method=="QR"){
+			p.resize(m+1);
+			Matrix<type> A(n,m+1);
+			Colvec<type> b(n);
+			for(int i=0;i<n;++i){
+				A[i][0]=1;
+				for(int j=1;j<=m;++j)A[i][j]=A[i][j-1]*x[i];
+			}
+			for(int i=0;i<n;++i)b[i]=y[i];
+			pair<Matrix<type>,Colvec<type>> qr=QR(A);
+			/*答题用，使用时注释掉*/
+			Matrix<type> R(m+1,m+1);
+			for(int i=0;i<=m;++i){
+				for(int j=0;j<i;++j)R[i][j]=0;
+				for(int j=i;j<=m;++j)R[i][j]=qr.first[i][j];
+			}
+			cout<<R<<endl;
+			R=~R*R;
+			Jacobi_Diagnize(R);
+			vector<type> eig(m+1);
+			for(int i=0;i<=m;++i)eig[i]=fabs(R[i][i]),cout<<eig[i]<<' ';
+			cout<<sqrt(*max_element(eig.begin(),eig.end()))<<endl;
+			/**/
+			pair<Colvec<type>,type> sol=QR_LS(A,b);
+			for(int i=0;i<=m;++i)p[i]=sol.first[i];
+		}
+	}
+	Polynomial<type> getpoly(){return p;}
 };
 \end{verbatim}
 
@@ -263,7 +263,7 @@ G=
 \end{bmatrix}
 \end{equation}
 
-用 QR 方法（详见 \verb|Matrix.h|）求得特征值为 $45851,761.682,707.566$，二范数下条件数为 $64.8011$。
+因为 $G$ 是对称矩阵，所以 $G$ 的二范数就是绝对值最大的特征值。用 Jacobi 迭代法（详见 \verb|Matrix.h|）求得 $G$ 特征值为 $45851.5,51.1705,2.41567$，二范数下条件数为 $45851.5$。
 
 正交分解法中，
 
@@ -276,7 +276,7 @@ R_1=
 \end{bmatrix}
 \end{equation}
 
-$R_1$ 是上三角阵，因此特征值就是对角元。为 $37.4438,13.8744,4.58258$，二范数下条件数为 $8.17092$。
+用 Jacobi 方法求得 $R_1^TR_1$ 的特征值为 $45851.5,51.1705,2.41567$（事实上 $G=A^TA=R^TR=R_1^TR_1$），二范数下条件数为 $\sqrt{45851.5}=214.13$。
 
 矩阵的条件数反映了方程组的稳定性，进而反映了算法的稳定性。因此，正交分解的稳定性比正则化方程组要好。
 
