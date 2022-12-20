@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#include "BSpline.h"
+#include "Spline.h"
 #include "../HW1/function.h"
 using namespace std;
 
@@ -19,26 +19,37 @@ public:
 	}
 } y;
 
-void heart_plot(int n, int m, const char* file) {
-	vector <double> f;
-	f.resize(n/2);
-	for (int i = 0; i <= n/2 - 1; ++ i) f[i] = x((i+0.5)*2*PI/n);
-	QuadraticBSpline<double> X1 = QuadraticBSpline<double>(0, n/2, f, 0, 0);
-	for (int i = 0; i <= n/2 - 1; ++ i) f[i] = y((i+0.5)*2*PI/n);
-	QuadraticBSpline<double> Y1 = QuadraticBSpline<double>(0, n/2, f, 2/Q, -2/Q);
-	for (int i = 0; i <= n/2 - 1; ++ i) f[i] = x((i+n/2+0.5)*2*PI/n);
-	QuadraticBSpline<double> X2 = QuadraticBSpline<double>(0, n/2, f, 0, 0);
-	for (int i = 0; i <= n/2 - 1; ++ i) f[i] = y((i+n/2+0.5)*2*PI/n);
-	QuadraticBSpline<double> Y2 = QuadraticBSpline<double>(0, n/2, f, -2/Q, 2/Q);
-	ofstream out1(file);
-	out1 << "x,y" << '\n';
-	for (int i = 0; i < m/2; ++ i) out1 << X1.GetValue(1.0*i*n/m) << ',' << Y1.GetValue(1.0*i*n/m) << '\n';
-	for (int i = 0; i < m/2; ++ i) out1 << X2.GetValue(1.0*i*n/m) << ',' << Y2.GetValue(1.0*i*n/m) << '\n';
+void Linear_heart_plot(int n, int m, const char* file) {
+	LinearSpline<double> X = LinearSplineInterpolation<double>(x, 0, 2*PI, n);
+	LinearSpline<double> Y = LinearSplineInterpolation<double>(y, 0, 2*PI, n);
+	ofstream out(file);
+	out << "x,y" << '\n';
+	for (int i = 0; i <= m; ++ i) out << X.GetValue(2*PI*i/m) << ',' << Y.GetValue(2*PI*i/m) << '\n';
+}
 
+void Cubic_heart_plot(int n, int m, const string& mode, const char* file) {
+	ofstream out(file);
+	out << "x,y" << '\n';
+	if (mode == "Natural") {
+		CubicSpline<double> X = CubicSplineInterpolation<double>(x, 0, 2*PI, n, mode);
+		CubicSpline<double> Y = CubicSplineInterpolation<double>(y, 0, 2*PI, n, mode);
+		for (int i = 0; i <= m; ++ i) out << X.GetValue(2*PI*i/m) << ',' << Y.GetValue(2*PI*i/m) << '\n';
+	}
+	else {
+		CubicSpline<double> X = CubicSplineInterpolation<double>(x, PI*0.2, PI*2.2, n, mode);
+		CubicSpline<double> Y = CubicSplineInterpolation<double>(y, PI*0.2, PI*2.2, n, mode);
+		for (int i = 0; i <= m; ++ i) out << X.GetValue(PI*0.2+2*PI*i/m) << ',' << Y.GetValue(PI*0.2+2*PI*i/m) << '\n';
+	}
 }
 
 int main() {
-	heart_plot(10, 5000, "e1.csv");
-	heart_plot(40, 5000, "e2.csv");
-	heart_plot(160, 5000, "e3.csv");
+	Linear_heart_plot(10, 5000, "e1.csv");
+	Linear_heart_plot(40, 5000, "e2.csv");
+	Linear_heart_plot(160, 5000, "e3.csv");
+	Cubic_heart_plot(10, 5000, "Natural", "e4.csv");
+	Cubic_heart_plot(40, 5000, "Natural", "e5.csv");
+	Cubic_heart_plot(160, 5000, "Natural", "e6.csv");
+	Cubic_heart_plot(10, 5000, "Complete", "e7.csv");
+	Cubic_heart_plot(40, 5000, "Complete", "e8.csv");
+	Cubic_heart_plot(160, 5000, "Complete", "e9.csv");
 }

@@ -9,7 +9,7 @@ class F : public Function<double> {
 	}
 	virtual double d (const double& x, const int& k = 1) const {
 		if (k == 1) return -50 * x / (1 + 25*x*x) / (1 + 25*x*x);
-		else if (k == 2) return (-50 + 1250*x*x) / (1 + 25*x*x) / (1 + 25*x*x) / (1 + 25*x*x);
+		else if (k == 2) return (-50 + 3750*x*x) / (1 + 25*x*x) / (1 + 25*x*x) / (1 + 25*x*x);
 		else throw 0;
 	}
 } f;
