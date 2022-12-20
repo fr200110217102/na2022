@@ -1,12 +1,11 @@
 #include <bits/stdc++.h>
 #include "../HW1/function.h"
-#include "../Matrix.h"
+#include "Thomas.h"
 using namespace std;
 
 template <class type>
 class LinearSpline {
 private:
-	int n;
 	vector <type> x, f;	// 结点，函数值
 public:
 	LinearSpline(const vector<type>& x, const vector<type>& f) : x(x), f(f) {}
@@ -27,13 +26,11 @@ LinearSpline<type> LinearSplineInterpolation(const Function <type>& f, const typ
 template <class type>
 class CubicSpline {
 private:
-	int n;
 	vector <type> x, f, m, M;	// 结点, 函数值, 一阶导, 二阶导
 public:
 	CubicSpline(const vector<type>& x, const vector<type>& f, const string& mode = "Natural", const type& m0 = 0, const type& mn = 0) : x(x), f(f) {
-		n = x.size() - 1;
+		int n = x.size() - 1;
 		m.resize(n+1);
-		M.resize(n+1);
 		vector <type> l(n+1), u(n+1);	// lambda, mu
 		for (int i = 1; i <= n-1; ++ i) {
 			l[i] = (x[i] - x[i-1]) / (x[i+1] - x[i-1]);
@@ -41,8 +38,7 @@ public:
 		}
 
 		vector <type> dq1(n+1), dq2(n+2);	// 一阶差商, 二阶差商
-		Matrix <type> A(n+1, n+1);			// 系数矩阵
-		Colvec <type> b(n+1), sol(n+1);
+		vector <type> a(n+1), b(n), c(n), y(n+1);
 
 		if (mode == "Natural" && (m0 != 0 || mn != 0)) throw "Invalid Parameter!";
 		if (mode == "Complete" || mode == "Natural") {
@@ -52,16 +48,16 @@ public:
 			for (int i = 2; i <= n; ++ i)
 				dq2[i] = (dq1[i] - dq1[i-1]) / (x[i] - x[i-2]);
 			dq2[n+1] = (mn - dq1[n]) / (x[n] - x[n-1]);
+
 			for (int i = 1; i <= n-1; ++ i) {
-				A[i][i] = 2;
-				A[i][i-1] = u[i];
-				A[i][i+1] = l[i];
-				b[i] = 6 * dq2[i+1];
+				a[i] = 2;
+				b[i-1] = u[i];
+				c[i] = l[i];
+				y[i] = 6 * dq2[i+1];
 			}
-			A[0][0] = 2, A[0][1] = 1, b[0] = 6 * dq2[1];
-			A[n][n] = 2, A[n][n-1] = 1, b[n] = 6 * dq2[n+1];
-			sol = Gauss_Improved_Solve(A, b);
-			for (int i = 0; i <= n; ++ i) M[i] = sol[i];
+			a[0] = 2, c[0] = 1, y[0] = 6 * dq2[1];
+			a[n] = 2, b[n-1] = 1, y[n] = 6 * dq2[n+1];
+			M = Thomas(a, b, c, y);
 			m[0] = m0, m[n] = mn;
 			for (int i = 1; i <= n-1; ++ i)
 				m[i] = dq1[i+1] - (2 * M[i] + M[i+1]) * (x[i+1] - x[i]) / 6;
@@ -72,15 +68,14 @@ public:
 			for (int i = 2; i <= n; ++ i)
 				dq2[i] = (dq1[i] - dq1[i-1]) / (x[i] - x[i-2]);
 			for (int i = 1; i <= n-1; ++ i) {
-				A[i][i] = 2;
-				A[i][i-1] = u[i];
-				A[i][i+1] = l[i];
-				b[i] = 6 * dq2[i+1];
+				a[i] = 2;
+				b[i-1] = u[i];
+				c[i] = l[i];
+				y[i] = 6 * dq2[i+1];
 			}
-			A[0][0] = 1, b[0] = m0;
-			A[n][n] = 1, b[n] = mn;
-			sol = Gauss_Improved_Solve(A, b);
-			for (int i = 0; i <= n; ++ i) M[i] = sol[i];
+			a[0] = 1, y[0] = m0;
+			a[n] = 1, y[n] = mn;
+			M = Thomas(a, b, c, y);
 			for (int i = 0; i <= n-1; ++ i)
 				m[i] = dq1[i+1] - (2 * M[i] + M[i+1]) * (x[i+1] - x[i]) / 6;
 			m[n] = dq1[n] - (2 * M[n] + M[n-1]) * (x[n-1] - x[n]) / 6;
