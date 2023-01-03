@@ -42,13 +42,14 @@ public:
 
 		if (mode == "Natural" && (m0 != 0 || mn != 0)) throw "Invalid Parameter!";
 		if (mode == "Complete" || mode == "Natural") {
+			// 计算差商
 			for (int i = 1; i <= n; ++ i)
 				dq1[i] = (f[i] - f[i-1]) / (x[i] - x[i-1]);
 			dq2[1] = (dq1[1] - m0) / (x[1] - x[0]);
 			for (int i = 2; i <= n; ++ i)
 				dq2[i] = (dq1[i] - dq1[i-1]) / (x[i] - x[i-2]);
 			dq2[n+1] = (mn - dq1[n]) / (x[n] - x[n-1]);
-
+			// 构造三对角方程组
 			for (int i = 1; i <= n-1; ++ i) {
 				a[i] = 2;
 				b[i-1] = u[i];
@@ -57,16 +58,20 @@ public:
 			}
 			a[0] = 2, c[0] = 1, y[0] = 6 * dq2[1];
 			a[n] = 2, b[n-1] = 1, y[n] = 6 * dq2[n+1];
+			// 调用 Thomas 算法解出结点处的二阶导 M
 			M = Thomas(a, b, c, y);
+			// 根据 M 的值计算 m
 			m[0] = m0, m[n] = mn;
 			for (int i = 1; i <= n-1; ++ i)
 				m[i] = dq1[i+1] - (2 * M[i] + M[i+1]) * (x[i+1] - x[i]) / 6;
 		}
 		else if (mode == "Specified_Second_Derivatives") {
+			// 计算差商
 			for (int i = 1; i <= n; ++ i)
 				dq1[i] = (f[i] - f[i-1]) / (x[i] - x[i-1]);
 			for (int i = 2; i <= n; ++ i)
 				dq2[i] = (dq1[i] - dq1[i-1]) / (x[i] - x[i-2]);
+			// 构造三对角方程组
 			for (int i = 1; i <= n-1; ++ i) {
 				a[i] = 2;
 				b[i-1] = u[i];
@@ -75,13 +80,16 @@ public:
 			}
 			a[0] = 1, y[0] = m0;
 			a[n] = 1, y[n] = mn;
+			// 调用 Thomas 算法解出结点处的二阶导 M
 			M = Thomas(a, b, c, y);
+			// 根据 M 的值计算 m
 			for (int i = 0; i <= n-1; ++ i)
 				m[i] = dq1[i+1] - (2 * M[i] + M[i+1]) * (x[i+1] - x[i]) / 6;
 			m[n] = dq1[n] - (2 * M[n] + M[n-1]) * (x[n-1] - x[n]) / 6;
 		}
 	}
 	type GetValue(const type& _x) const {
+		// 求出 x 所在结点区间，根据该区间上的解析式计算样条函数的值
 		int i = upper_bound(x.begin(), x.end(), _x) - x.begin() - 1;
 		type t = _x - x[i], c0 = f[i], c1 = m[i], c2 = M[i] / 2, c3 = (M[i+1] - M[i]) / (x[i+1] - x[i]) / 6;
 		return c0 + t * (c1 + t * (c2 + c3 * t));

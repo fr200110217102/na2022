@@ -173,13 +173,14 @@ public:
 
 		if (mode == "Natural" && (m0 != 0 || mn != 0)) throw "Invalid Parameter!";
 		if (mode == "Complete" || mode == "Natural") {
+			// 计算差商
 			for (int i = 1; i <= n; ++ i)
 				dq1[i] = (f[i] - f[i-1]) / (x[i] - x[i-1]);
 			dq2[1] = (dq1[1] - m0) / (x[1] - x[0]);
 			for (int i = 2; i <= n; ++ i)
 				dq2[i] = (dq1[i] - dq1[i-1]) / (x[i] - x[i-2]);
 			dq2[n+1] = (mn - dq1[n]) / (x[n] - x[n-1]);
-
+			// 构造三对角方程组
 			for (int i = 1; i <= n-1; ++ i) {
 				a[i] = 2;
 				b[i-1] = u[i];
@@ -188,16 +189,20 @@ public:
 			}
 			a[0] = 2, c[0] = 1, y[0] = 6 * dq2[1];
 			a[n] = 2, b[n-1] = 1, y[n] = 6 * dq2[n+1];
+			// 调用 Thomas 算法解出结点处的二阶导 M
 			M = Thomas(a, b, c, y);
+			// 根据 M 的值计算 m
 			m[0] = m0, m[n] = mn;
 			for (int i = 1; i <= n-1; ++ i)
 				m[i] = dq1[i+1] - (2 * M[i] + M[i+1]) * (x[i+1] - x[i]) / 6;
 		}
 		else if (mode == "Specified_Second_Derivatives") {
+			// 计算差商
 			for (int i = 1; i <= n; ++ i)
 				dq1[i] = (f[i] - f[i-1]) / (x[i] - x[i-1]);
 			for (int i = 2; i <= n; ++ i)
 				dq2[i] = (dq1[i] - dq1[i-1]) / (x[i] - x[i-2]);
+			// 构造三对角方程组
 			for (int i = 1; i <= n-1; ++ i) {
 				a[i] = 2;
 				b[i-1] = u[i];
@@ -206,13 +211,16 @@ public:
 			}
 			a[0] = 1, y[0] = m0;
 			a[n] = 1, y[n] = mn;
+			// 调用 Thomas 算法解出结点处的二阶导 M
 			M = Thomas(a, b, c, y);
+			// 根据 M 的值计算 m
 			for (int i = 0; i <= n-1; ++ i)
 				m[i] = dq1[i+1] - (2 * M[i] + M[i+1]) * (x[i+1] - x[i]) / 6;
 			m[n] = dq1[n] - (2 * M[n] + M[n-1]) * (x[n-1] - x[n]) / 6;
 		}
 	}
 	type GetValue(const type& _x) const {
+		// 求出 x 所在结点区间，根据该区间上的解析式计算样条函数的值
 		int i = upper_bound(x.begin(), x.end(), _x) - x.begin() - 1;
 		type t = _x - x[i], c0 = f[i], c1 = m[i], c2 = M[i] / 2, c3 = (M[i+1] - M[i]) / (x[i+1] - x[i]) / 6;
 		return c0 + t * (c1 + t * (c2 + c3 * t));
@@ -418,7 +426,13 @@ B-Spline 通过将样条函数分解成 $n+m$ 个 $m$ 阶B-样条基函数的线
 
 \subsection{B-Spline的基函数}
 
-B-Spline的基函数通过递归定义。但当 $m=1,2,3$ 时，可以直接写出它们的表达式。
+经典B-Spline的基函数可通过递归定义。
+
+\begin{equation}
+    B_{i,\mathbb{Z}}^{n+1}(x)=\dfrac{x-i+1}{n+1}B_{i,\mathbb{Z}}^n(x)+\dfrac{i+n+1-x}{n+1}B_{i+1,\mathbb{Z}}^n(x)
+\end{equation}
+
+当 $m=1,2,3$ 时，也可以直接写出它们的表达式。
 
 \begin{equation}
 B_{i,\mathbb{Z}}^1(x)=\left\{
@@ -456,26 +470,13 @@ B_{i,\mathbb{Z}}^3(x)=\left\{
 
 \begin{lstlisting}[language={c++}]
 template <class type>
-type B1(const int& i, const type& x) {
-	if (x > i-1 && x <= i) return x-i+1;
-	if (x > i && x <= i+1) return i+1-x;
-	return 0;
-}
-
-template <class type>
-type B2(const int& i, const type& x) {
-	if (x > i-1 && x <= i) return (x-i+1) * (x-i+1) / 2;
-	if (x > i && x <= i+1) return 0.75 - (x-i-0.5) * (x-i-0.5);
-	if (x > i+1 && x <= i+2) return (i+2-x) * (i+2-x) / 2;
-	return 0;
-}
-
-template <class type>
-type B3(const int& i, const type& x) {
-	if (x > i-1 && x <= i) return (x-i+1) * (x-i+1) * (x-i+1) / 6;
-	if (x > i && x <= i+1) return 2.0 / 3 - (x-i+1) * (i+1-x) * (i+1-x) / 2;
-	if (x > i+1 && x <= i+3) return B3(i, 2*i+2-x);
-	return 0;
+type B(const int& n, const int& i, const type& x) {
+	if (n == 0) {
+		if (i-1 < x && x <= i) return 1;
+		else return 0;
+	}
+	// 根据 B 样条基的递归定义计算
+	return (x-i+1) * B(n-1, i, x) / n + (i+n-x) * B(n-1, i+1, x) / n;
 }
 \end{lstlisting}
 
@@ -514,8 +515,8 @@ public:
 		if (_x < L || _x > R) throw "Out of Range!";
 		int i = floor(_x);
 		type res = 0;
-		if(i   >= L && i   <= R) res += coef[i  -L] * B1(i,   _x);
-		if(i+1 >= L && i+1 <= R) res += coef[i+1-L] * B1(i+1, _x);
+		if(i   >= L && i   <= R) res += coef[i  -L] * B(1, i,   _x);
+		if(i+1 >= L && i+1 <= R) res += coef[i+1-L] * B(1, i+1, _x);
 		return res;
 	}
 };
@@ -611,27 +612,33 @@ public:
 	CubicBSpline(const int& x0, const int& n, const vector<type>& f, const string& mode = "Natural", const type& m0 = 0, const type& mn = 0) : L(x0) {
 		R = L + n;
 		vector <type> a(n+1), b(n), c(n), y(n+1);
+		// 构造三对角方程组的中间 n-1 行
 		for (int i = 1; i < n; ++ i) {
 			a[i] = 4;
 			b[i-1] = 1;
 			c[i] = 1;
 			y[i] = 6 * f[i];
 		}
+		// 根据边界条件构造首尾两行
 		if (mode == "Natural" || mode == "Complete") {
 			a[0] = 2, c[0] = 1, y[0] = 3 * f[0] + m0;
 			a[n] = 2, b[n-1] = 1, y[n] = 3 * f[n] - mn;
+			// 解出中间 n+1 个系数
 			vector <type> t = Thomas(a, b, c, y);
 			coef.resize(n+3);
 			for (int i = 0; i <= n; ++ i) coef[i+1] = t[i];
+			// 计算首尾两个系数
 			coef[0] = coef[2] - 2 * m0;
 			coef[n+2] = coef[n] + 2 * mn;
 		}
 		else if (mode == "Specified_Second_Derivatives") {
 			a[0] = 6, y[0] = 6 * f[0] - m0;
 			a[n] = 6, y[n] = 6 * f[n] - mn;
+			// 解出中间 n+1 个系数
 			vector <type> t = Thomas(a, b, c, y);
 			coef.resize(n+3);
 			for (int i = 0; i <= n; ++ i) coef[i+1] = t[i];
+			// 计算首尾两个系数
 			coef[0] = m0 - coef[2] + 2 * coef[1];
 			coef[n+2] = mn - coef[n] + 2 * coef[n-1];
 		}
@@ -640,10 +647,10 @@ public:
 		if (_x < L || _x > R) throw "Out of Range!";
 		int i = floor(_x);
 		type res = 0;
-		if(i-2 >= L-2 && i-2 <= R) res += coef[i-2-L+2] * B3(i-2, _x);
-		if(i-1 >= L-2 && i-1 <= R) res += coef[i-1-L+2] * B3(i-1, _x);
-		if(i   >= L-2 && i   <= R) res += coef[i  -L+2] * B3(i  , _x);
-		if(i+1 >= L-2 && i+1 <= R) res += coef[i+1-L+2] * B3(i+1, _x);
+		if(i-2 >= L-2 && i-2 <= R) res += coef[i-2-L+2] * B(3, i-2, _x);
+		if(i-1 >= L-2 && i-1 <= R) res += coef[i-1-L+2] * B(3, i-1, _x);
+		if(i   >= L-2 && i   <= R) res += coef[i  -L+2] * B(3, i  , _x);
+		if(i+1 >= L-2 && i+1 <= R) res += coef[i+1-L+2] * B(3, i+1, _x);
 		return res;
 	}
 };
@@ -685,6 +692,7 @@ public:
 	QuadraticBSpline(const int& x0, const int& n, const vector<type>& f, const type& f0, const type& fn) : L(x0) {
 		R = L + n;
 		vector <type> a(n), b(n-1), c(n-1), y(n);
+		// 构造三对角方程组
 		for (int i = 1; i < n-1; ++ i) {
 			a[i] = 6;
 			b[i-1] = 1;
@@ -693,9 +701,11 @@ public:
 		}
 		a[0] = 5, c[0] = 1, y[0] = 8 * f[0] - 2 * f0;
 		a[n-1] = 5, b[n-2] = 1, y[n-1] = 8 * f[n-1] - 2 * fn;
+		// 解出中间 n 个系数
 		vector <type> t = Thomas(a, b, c, y);
 		coef.resize(n+2);
 		for (int i = 0; i < n; ++ i) coef[i+1] = t[i];
+		// 计算首尾两个系数
 		coef[0] = 2 * f0 - coef[1];
 		coef[n+1] = 2 * fn - coef[n];
 	}
@@ -703,9 +713,9 @@ public:
 		if (_x < L || _x > R) throw "Out of Range!";
 		int i = floor(_x);
 		type res = 0;
-		if(i-1 >= L-1 && i-1 <= R) res += coef[i-1-L+1] * B2(i-1, _x);
-		if(i   >= L-1 && i   <= R) res += coef[i  -L+1] * B2(i  , _x);
-		if(i+1 >= L-1 && i+1 <= R) res += coef[i+1-L+1] * B2(i+1, _x);
+		if(i-1 >= L-1 && i-1 <= R) res += coef[i-1-L+1] * B(2, i-1, _x);
+		if(i   >= L-1 && i   <= R) res += coef[i  -L+1] * B(2, i  , _x);
+		if(i+1 >= L-1 && i+1 <= R) res += coef[i+1-L+1] * B(2, i+1, _x);
 		return res;
 	}
 };
@@ -731,46 +741,53 @@ f''(x)=\dfrac {-2+6x^2}{(1+x^2)^3}
 然后直接调用对应函数，将插值结果输出到 \verb|csv| 中，再用 python 读取并输出，测试线性样条、三次样条和二次样条的拟合效果。
 
 \begin{lstlisting}[language={c++}]
-template <class type>
-class QuadraticBSpline{
-private:
-	int L, R;
-	vector <type> coef;
-public:
-	QuadraticBSpline(const int& x0, const int& n, const vector<type>& f, const type& f0, const type& fn) : L(x0) {
-		R = L + n;
-		vector <type> a(n), b(n-1), c(n-1), y(n);
-		for (int i = 1; i < n-1; ++ i) {
-			a[i] = 6;
-			b[i-1] = 1;
-			c[i] = 1;
-			y[i] = 8 * f[i];
-		}
-		a[0] = 5, c[0] = 1, y[0] = 8 * f[0] - 2 * f0;
-		a[n-1] = 5, b[n-2] = 1, y[n-1] = 8 * f[n-1] - 2 * fn;
-		vector <type> t = Thomas(a, b, c, y);
-		coef.resize(n+2);
-		for (int i = 0; i < n; ++ i) coef[i+1] = t[i];
-		coef[0] = 2 * f0 - coef[1];
-		coef[n+1] = 2 * fn - coef[n];
-	}
-	type GetValue(const type& _x) const {
-		if (_x < L || _x > R) throw "Out of Range!";
-		int i = floor(_x);
-		type res = 0;
-		if(i-1 >= L-1 && i-1 <= R) res += coef[i-1-L+1] * B2(i-1, _x);
-		if(i   >= L-1 && i   <= R) res += coef[i  -L+1] * B2(i  , _x);
-		if(i+1 >= L-1 && i+1 <= R) res += coef[i+1-L+1] * B2(i+1, _x);
-		return res;
-	}
-};
+#include <bits/stdc++.h>
+#include "BSpline.h"
+#include "../HW1/function.h"
+using namespace std;
 
-template <class type>
-QuadraticBSpline<type> QuadraticBSplineInterpolation(const Function <type>& f, const int& l, const int& n) {
-	vector <type> y(n);
-	for(int i = 0; i < n; ++ i) y[i] = f(l+i+0.5);
-	type f0 = f(l), fn = f(l+n);
-	return QuadraticBSpline<type>(l, n, y, f0, fn);
+class F : public Function<double> {
+public:
+	virtual double operator () (const double& x) const {
+		return 1 / (1 + x*x);
+	}
+	virtual double d (const double& x, const int& k) const {
+		if (k == 1) return -2*x / (1 + x*x) / (1 + x*x);
+		else if (k == 2) return (-2 + 6*x*x) / (1 + x*x) / (1 + x*x) / (1 + x*x);
+		else throw 0;
+	}
+} f;
+
+int main() {
+	LinearBSpline<double> CL = LinearBSplineInterpolation(f, -5, 10);
+	ofstream outL("cl.csv");
+	outL << "x,y" << endl;
+	for(int i = -4999; i <= 4999; ++ i) outL << i * 0.001 << ',' << CL.GetValue(i * 0.001) << endl;
+
+	CubicBSpline<double> C1 = CubicBSplineInterpolation<double>(f, -5, 10, "Natural");
+	ofstream out1("c1.csv");
+	out1 << "x,y" << endl;
+	for(int i = -4999; i <= 4999; ++ i) out1 << i * 0.001 << ',' << C1.GetValue(i * 0.001) << endl;
+
+	CubicBSpline<double> C2 = CubicBSplineInterpolation<double>(f, -5, 10, "Complete");
+	ofstream out2("c2.csv");
+	out2 << "x,y" << endl;
+	for(int i = -4999; i <= 4999; ++ i) out2 << i * 0.001 << ',' << C2.GetValue(i * 0.001) << endl;
+
+	CubicBSpline<double> C3 = CubicBSplineInterpolation<double>(f, -5, 10, "Specified_Second_Derivatives");
+	ofstream out3("c3.csv");
+	out3 << "x,y" << endl;
+	for(int i = -4999; i <= 4999; ++ i) out3 << i * 0.001 << ',' << C3.GetValue(i * 0.001) << endl;
+	
+	QuadraticBSpline<double> CQ = QuadraticBSplineInterpolation<double>(f, -5, 10);
+	ofstream outQ("cq.csv");
+	outQ << "x,y" << endl;
+	for(int i = -4999; i <= 4999; ++ i) outQ << i * 0.001 << ',' << CQ.GetValue(i * 0.001) << endl;
+
+	ofstream outd("d.csv");
+	vector<double> a = {-3.5,-3,-0.5,0,0.5,3,3.5};
+	outd << "a_i,ESL,ES1,ES2,ES3,ESQ" << endl;
+	for(int i = 0; i < 7; ++ i) outd << a[i] << ',' << fabs(CL.GetValue(a[i]) - f(a[i])) << ',' << fabs(C1.GetValue(a[i]) - f(a[i])) << ',' << fabs(C2.GetValue(a[i]) - f(a[i])) << ',' << fabs(C3.GetValue(a[i]) - f(a[i])) << ',' << fabs(CQ.GetValue(a[i]) - f(a[i])) << endl;
 }
 \end{lstlisting}
 
@@ -846,10 +863,28 @@ $x$ & $E_L$ & $E_C$ & $E_N$ & $E_S$ & $E_Q$  \\ \hline
 由极坐标可得
 
 \begin{equation}
-    x(t)=\sin t,y(t)=\dfrac 23(\sqrt 3\cos t+\sqrt{\sqrt 3|\sin t|})
+    x(t)=\sqrt{3} sin t,y(t)=\dfrac 23(\sqrt 3\cos t+\sqrt{\sqrt 3|\sin t|})
 \end{equation}
 
 这样就建立了心形曲线的参数方程。
+
+按题目要求使用累计弧长参数，故将曲线重新参数化。
+
+\begin{equation}
+    s(t)=\int_0^t\sqrt{x'(\tau)^2+y'(\tau)^2}d\tau
+\end{equation}
+
+但这个积分是没有原函数的，更不能显示解出 $t$。但注意到我们并不需要求出 $t$ 关于 $s$ 的表达式，只需求出 $s$ 取值为 $\dfrac kn L,k=1,2,\dots,n-1$ 的值进而求出结点处的 $t$ 值（其中 $L$ 为总弧长），然后以这些 $t$ 为结点构造样条函数。
+
+所以问题转化为求解 $n-1$ 个方程 $s(t)=\dfrac kn L$。它等价于
+
+\begin{equation}
+    \int_{t_k}^{t_{k+1}}\sqrt{x'(\tau)^2+y'(\tau)^2}d\tau=\dfrac kn L
+\end{equation}
+
+这是一个非线性方程。因为 $s$ 的导数难以求出，故可以使用第一章的二分法或割线法求解（本文使用二分法）。
+
+最后一个问题就是 $s(t)$ 是一个不能直接计算的积分，因此我们利用第六章的辛普森积分计算。但被积分式在积分边界处是奇异的，直接用二次函数拟合效果很差，即使用复化辛普森公式分段收敛速度也非常慢。因此采用自适应辛普森积分，即当 $|I^S_{l,r}(s)-(I^S_{l,\frac {l+r}2}(s)+I^S_{\frac {l+r}2,r}(s)|<\varepsilon$ 时直接取 $I^S_{l,r}(s)$ 作为 $(l,r)$ 上积分的近似，否则取中点，两边分别继续分治计算。
 
 分别用分段线性样条和自然样条进行拟合（代码见 E.cpp）：
 
@@ -859,12 +894,15 @@ $x$ & $E_L$ & $E_C$ & $E_N$ & $E_S$ & $E_Q$  \\ \hline
 #include "../HW1/function.h"
 using namespace std;
 
-const double PI = acos(-1), Q = sqrt(3);
+const double PI = acos(-1), Q = sqrt(3), dt = 1e-8, eps = 1e-12;
 
 class X : public Function<double> {
 public:
 	virtual double operator () (const double& t) const {
-		return sin(t);
+		return Q * sin(t);
+	}
+	virtual double d(const double& t) const {
+		return Q * cos(t);
 	}
 } x;
 
@@ -873,31 +911,86 @@ public:
 	virtual double operator () (const double& t) const {
 		return 2 * (Q * cos(t) + sqrt(Q * fabs(sin(t)))) / 3;
 	}
+	virtual double d(const double& t) const {
+		if (sin(t) > 0) return 2 * (-Q * sin(t) + sqrt(Q) * cos(t) / 2 / sqrt(fabs(sin(t)))) / 3;
+		else return 2 * (-Q * sin(t) - sqrt(Q) * cos(t) / sqrt(fabs(sin(t)))) / 3;
+	}
 } y;
 
-void Linear_heart_plot(int n, int m, const char* file) {
-	LinearSpline<double> X = LinearSplineInterpolation<double>(x, 0, 2*PI, n);
-	LinearSpline<double> Y = LinearSplineInterpolation<double>(y, 0, 2*PI, n);
-	ofstream out(file);
-	out << "x,y" << '\n';
-	for (int i = 0; i <= m; ++ i) out << X.GetValue(2*PI*i/m) << ',' << Y.GetValue(2*PI*i/m) << '\n';
+class S : public Function<double>{
+public:
+	virtual double operator () (const double& t) const {
+		return sqrt(x.d(t) * x.d(t) + y.d(t) * y.d(t));
+	}
+} s;
+
+// (l, r) 上的辛普森积分
+double IS(const Function<double>& f, const double& l, const double& r) {
+	return (r-l) * (f(l) + 4 * f((l+r)/2) + f(r)) / 6;
+}
+// 自适应辛普森积分
+double Simpson(const Function<double>& f, const double& l, const double& r) {
+	double mid = (l+r) / 2, s = IS(f, l, r), t = IS(f, l, mid) + IS(f, mid, r);
+	if (fabs(s-t) < eps) return s;
+	return Simpson(f, l, mid) + Simpson(f, mid, r);
 }
 
-void Cubic_heart_plot(int n, int m, const string& mode, const char* file) {
-	CubicSpline<double> X = CubicSplineInterpolation<double>(x, 0, 2*PI, n, mode);
-	CubicSpline<double> Y = CubicSplineInterpolation<double>(y, 0, 2*PI, n, mode);
+// 求出曲线的 n 等分点
+vector<double> Get_Knots(int n) {
+	double I = Simpson(s, dt, PI - dt) * 2;
+	vector<double> x(n+1), y(n+1);
+	x[0] = dt;
+	// 在曲线上按长度均匀取插值结点
+	for (int i = 1; i <= n/2-1; ++ i) {
+		double l = x[i-1], r = 2*PI;
+		while(r-l>=1e-8){
+			double mid = (l+r) / 2;
+			double Im = Simpson(s, x[i-1], mid);
+			if (Im < I/n) l = mid;
+			else r = mid;
+		}
+		x[i] = l;
+	}
+	x[n/2] = PI - dt;
+	for (int i = 0; i <= n/2-1; ++ i) {
+		x[n-i] = 2*PI - x[i];
+	}
+	return x;
+}
+
+// 用线性样条拟合曲线
+// file 曲线数据的文件名
+void Linear_heart_plot(int n, int m, const char* file) {
+	vector<double> t = Get_Knots(n), f(n+1), g(n+1);
+	for (int i = 0; i <= n; ++ i) f[i] = x(t[i]);
+	for (int i = 0; i <= n; ++ i) g[i] = y(t[i]);
+	LinearSpline<double> X = LinearSpline<double>(t, f);
+	LinearSpline<double> Y = LinearSpline<double>(t, g);
 	ofstream out(file);
 	out << "x,y" << '\n';
-	for (int i = 0; i <= m; ++ i) out << X.GetValue(2*PI*i/m) << ',' << Y.GetValue(2*PI*i/m) << '\n';
+	for (int i = 0; i <= m; ++ i) out << X.GetValue(dt+(2*PI-2*dt)*i/m) << ',' << Y.GetValue(dt+(2*PI-2*dt)*i/m) << '\n';
+}
+
+// 用三次样条拟合曲线（这里只实现了自然三次样条）
+void Cubic_heart_plot(int n, int m, const string& mode, const char* file) {
+	vector<double> t = Get_Knots(n), f(n+1), g(n+1);
+	for (int i = 0; i <= n; ++ i) f[i] = x(t[i]);
+	for (int i = 0; i <= n; ++ i) g[i] = y(t[i]);
+	double m0 = 0, mn = 0;
+	CubicSpline<double> X = CubicSpline<double>(t, f, mode, m0, mn);
+	CubicSpline<double> Y = CubicSpline<double>(t, g, mode, m0, mn);
+	ofstream out(file);
+	out << "x,y" << '\n';
+	for (int i = 0; i <= m; ++ i) out << X.GetValue(dt+(2*PI-2*dt)*i/m) << ',' << Y.GetValue(dt+(2*PI-2*dt)*i/m) << '\n';
 }
 
 int main() {
-	Linear_heart_plot(10, 5000, "e1.csv");
-	Linear_heart_plot(40, 5000, "e2.csv");
-	Linear_heart_plot(160, 5000, "e3.csv");
-	Cubic_heart_plot(10, 5000, "Natural", "e4.csv");
-	Cubic_heart_plot(40, 5000, "Natural", "e5.csv");
-	Cubic_heart_plot(160, 5000, "Natural", "e6.csv");
+	Linear_heart_plot(10, 50000, "e1.csv");
+	Linear_heart_plot(40, 50000, "e2.csv");
+	Linear_heart_plot(160, 50000, "e3.csv");
+	Cubic_heart_plot(10, 50000, "Natural", "e4.csv");
+	Cubic_heart_plot(40, 50000, "Natural", "e5.csv");
+	Cubic_heart_plot(160, 50000, "Natural", "e6.csv");
 }
 \end{lstlisting}
 
@@ -922,47 +1015,6 @@ int main() {
 
 $n=10$ 和 $n=40$ 时，两种样条的表现都很差；$n=160$ 时，样条在远离 $x=0$ 的区域拟合效果很好，但在 $x=0$ 附近拟合效果很差。这是因为在 $x=0$ 附近 $y$ 的导数趋向于无穷大，拟合问题本身的条件数很大，不能期望算法的拟合效果很好。
 
-需要注意的是，对于心形曲线，不能直接用完全样条或端点处二阶导指定的样条拟合，因为它们需要取到 $t=0$ 处的导数值，而此时 $|y'(t)|\rightarrow \infty$。当然，注意到本题拟合的曲线是周期的，因此可任选其他的端点（例如 $\dfrac \pi 2$），这样得到的结果和自然样条是类似的。相关部分代码修改如下：
-
-\begin{lstlisting}[language={c++}]
-void Cubic_heart_plot(int n, int m, const string& mode, const char* file) {
-	ofstream out(file);
-	out << "x,y" << '\n';
-	if (mode == "Natural") {
-		CubicSpline<double> X = CubicSplineInterpolation<double>(x, 0, 2*PI, n, mode);
-		CubicSpline<double> Y = CubicSplineInterpolation<double>(y, 0, 2*PI, n, mode);
-		for (int i = 0; i <= m; ++ i) out << X.GetValue(2*PI*i/m) << ',' << Y.GetValue(2*PI*i/m) << '\n';
-	}
-	else {
-		CubicSpline<double> X = CubicSplineInterpolation<double>(x, PI*0.2, PI*2.2, n, mode);
-		CubicSpline<double> Y = CubicSplineInterpolation<double>(y, PI*0.2, PI*2.2, n, mode);
-		for (int i = 0; i <= m; ++ i) out << X.GetValue(PI*0.2+2*PI*i/m) << ',' << Y.GetValue(PI*0.2+2*PI*i/m) << '\n';
-	}
-}
-
-int main() {
-	Linear_heart_plot(10, 5000, "e1.csv");
-	Linear_heart_plot(40, 5000, "e2.csv");
-	Linear_heart_plot(160, 5000, "e3.csv");
-	Cubic_heart_plot(10, 5000, "Natural", "e4.csv");
-	Cubic_heart_plot(40, 5000, "Natural", "e5.csv");
-	Cubic_heart_plot(160, 5000, "Natural", "e6.csv");
-	Cubic_heart_plot(10, 5000, "Complete", "e7.csv");
-	Cubic_heart_plot(40, 5000, "Complete", "e8.csv");
-	Cubic_heart_plot(160, 5000, "Complete", "e9.csv");
-}
-\end{lstlisting}
-
-完全样条的拟合效果见图 \ref{e3}：
-
-\begin{figure}[htbp]
-\centering
-\begin{minipage}{5cm}
-    \centering
-    \includegraphics[width=5cm]{e3.png}
-    \caption{完全}
-    \label{e3}
-\end{minipage}
-\end{figure}
+需要注意的是，对于心形曲线，不能直接用完全样条或端点处二阶导指定的样条拟合，因为它们需要取到 $t=0$ 处的导数值，而此时 $|y'(t)|\rightarrow \infty$。当然，注意到本题拟合的曲线是周期的，因此可任选其他的端点（例如 $\dfrac \pi 2$），这样得到的结果和自然样条是类似的。但这样就失去了完全样条的优势（固定端点的斜率），所以这里不做实现。
 
 \end{document}

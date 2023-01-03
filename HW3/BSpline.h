@@ -4,26 +4,13 @@
 using namespace std;
 
 template <class type>
-type B1(const int& i, const type& x) {
-	if (x > i-1 && x <= i) return x-i+1;
-	if (x > i && x <= i+1) return i+1-x;
-	return 0;
-}
-
-template <class type>
-type B2(const int& i, const type& x) {
-	if (x > i-1 && x <= i) return (x-i+1) * (x-i+1) / 2;
-	if (x > i && x <= i+1) return 0.75 - (x-i-0.5) * (x-i-0.5);
-	if (x > i+1 && x <= i+2) return (i+2-x) * (i+2-x) / 2;
-	return 0;
-}
-
-template <class type>
-type B3(const int& i, const type& x) {
-	if (x > i-1 && x <= i) return (x-i+1) * (x-i+1) * (x-i+1) / 6;
-	if (x > i && x <= i+1) return 2.0 / 3 - (x-i+1) * (i+1-x) * (i+1-x) / 2;
-	if (x > i+1 && x <= i+3) return B3(i, 2*i+2-x);
-	return 0;
+type B(const int& n, const int& i, const type& x) {
+	if (n == 0) {
+		if (i-1 < x && x <= i) return 1;
+		else return 0;
+	}
+	// 根据 B 样条基的递归定义计算
+	return (x-i+1) * B(n-1, i, x) / n + (i+n-x) * B(n-1, i+1, x) / n;
 }
 
 template <class type>
@@ -39,8 +26,8 @@ public:
 		if (_x < L || _x > R) throw "Out of Range!";
 		int i = floor(_x);
 		type res = 0;
-		if(i   >= L && i   <= R) res += coef[i  -L] * B1(i,   _x);
-		if(i+1 >= L && i+1 <= R) res += coef[i+1-L] * B1(i+1, _x);
+		if(i   >= L && i   <= R) res += coef[i  -L] * B(1, i,   _x);
+		if(i+1 >= L && i+1 <= R) res += coef[i+1-L] * B(1, i+1, _x);
 		return res;
 	}
 };
@@ -61,27 +48,33 @@ public:
 	CubicBSpline(const int& x0, const int& n, const vector<type>& f, const string& mode = "Natural", const type& m0 = 0, const type& mn = 0) : L(x0) {
 		R = L + n;
 		vector <type> a(n+1), b(n), c(n), y(n+1);
+		// 构造三对角方程组的中间 n-1 行
 		for (int i = 1; i < n; ++ i) {
 			a[i] = 4;
 			b[i-1] = 1;
 			c[i] = 1;
 			y[i] = 6 * f[i];
 		}
+		// 根据边界条件构造首尾两行
 		if (mode == "Natural" || mode == "Complete") {
 			a[0] = 2, c[0] = 1, y[0] = 3 * f[0] + m0;
 			a[n] = 2, b[n-1] = 1, y[n] = 3 * f[n] - mn;
+			// 解出中间 n+1 个系数
 			vector <type> t = Thomas(a, b, c, y);
 			coef.resize(n+3);
 			for (int i = 0; i <= n; ++ i) coef[i+1] = t[i];
+			// 计算首尾两个系数
 			coef[0] = coef[2] - 2 * m0;
 			coef[n+2] = coef[n] + 2 * mn;
 		}
 		else if (mode == "Specified_Second_Derivatives") {
 			a[0] = 6, y[0] = 6 * f[0] - m0;
 			a[n] = 6, y[n] = 6 * f[n] - mn;
+			// 解出中间 n+1 个系数
 			vector <type> t = Thomas(a, b, c, y);
 			coef.resize(n+3);
 			for (int i = 0; i <= n; ++ i) coef[i+1] = t[i];
+			// 计算首尾两个系数
 			coef[0] = m0 - coef[2] + 2 * coef[1];
 			coef[n+2] = mn - coef[n] + 2 * coef[n-1];
 		}
@@ -90,10 +83,10 @@ public:
 		if (_x < L || _x > R) throw "Out of Range!";
 		int i = floor(_x);
 		type res = 0;
-		if(i-2 >= L-2 && i-2 <= R) res += coef[i-2-L+2] * B3(i-2, _x);
-		if(i-1 >= L-2 && i-1 <= R) res += coef[i-1-L+2] * B3(i-1, _x);
-		if(i   >= L-2 && i   <= R) res += coef[i  -L+2] * B3(i  , _x);
-		if(i+1 >= L-2 && i+1 <= R) res += coef[i+1-L+2] * B3(i+1, _x);
+		if(i-2 >= L-2 && i-2 <= R) res += coef[i-2-L+2] * B(3, i-2, _x);
+		if(i-1 >= L-2 && i-1 <= R) res += coef[i-1-L+2] * B(3, i-1, _x);
+		if(i   >= L-2 && i   <= R) res += coef[i  -L+2] * B(3, i  , _x);
+		if(i+1 >= L-2 && i+1 <= R) res += coef[i+1-L+2] * B(3, i+1, _x);
 		return res;
 	}
 };
@@ -118,6 +111,7 @@ public:
 	QuadraticBSpline(const int& x0, const int& n, const vector<type>& f, const type& f0, const type& fn) : L(x0) {
 		R = L + n;
 		vector <type> a(n), b(n-1), c(n-1), y(n);
+		// 构造三对角方程组
 		for (int i = 1; i < n-1; ++ i) {
 			a[i] = 6;
 			b[i-1] = 1;
@@ -126,9 +120,11 @@ public:
 		}
 		a[0] = 5, c[0] = 1, y[0] = 8 * f[0] - 2 * f0;
 		a[n-1] = 5, b[n-2] = 1, y[n-1] = 8 * f[n-1] - 2 * fn;
+		// 解出中间 n 个系数
 		vector <type> t = Thomas(a, b, c, y);
 		coef.resize(n+2);
 		for (int i = 0; i < n; ++ i) coef[i+1] = t[i];
+		// 计算首尾两个系数
 		coef[0] = 2 * f0 - coef[1];
 		coef[n+1] = 2 * fn - coef[n];
 	}
@@ -136,9 +132,9 @@ public:
 		if (_x < L || _x > R) throw "Out of Range!";
 		int i = floor(_x);
 		type res = 0;
-		if(i-1 >= L-1 && i-1 <= R) res += coef[i-1-L+1] * B2(i-1, _x);
-		if(i   >= L-1 && i   <= R) res += coef[i  -L+1] * B2(i  , _x);
-		if(i+1 >= L-1 && i+1 <= R) res += coef[i+1-L+1] * B2(i+1, _x);
+		if(i-1 >= L-1 && i-1 <= R) res += coef[i-1-L+1] * B(2, i-1, _x);
+		if(i   >= L-1 && i   <= R) res += coef[i  -L+1] * B(2, i  , _x);
+		if(i+1 >= L-1 && i+1 <= R) res += coef[i+1-L+1] * B(2, i+1, _x);
 		return res;
 	}
 };
