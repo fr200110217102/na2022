@@ -1,3 +1,5 @@
+#ifndef MATRIX
+#define MATRIX
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -535,7 +537,7 @@ pair <Colvec <T>, T> QR_LS(const Matrix <T> & a, const Colvec <T> & b) {
 }
 
 template <class T>
-Colvec <T> Jacobi(const Matrix <T> & a, const Colvec <T> & b, const T & eps) {
+Colvec <T> Jacobi(const Matrix <T> & a, const Colvec <T> & b, const T & eps = 1e-12) {
 	int n = a.row(), times = 0;
 	Colvec <T> now = b, last(n);
 	do{
@@ -554,7 +556,7 @@ Colvec <T> Jacobi(const Matrix <T> & a, const Colvec <T> & b, const T & eps) {
 }
 
 template <class T>
-Colvec <T> Gauss_Seidel(const Matrix <T> & a, const Colvec <T> & b, const T & eps) {
+Colvec <T> Gauss_Seidel(const Matrix <T> & a, const Colvec <T> & b, const T & eps = 1e-12) {
 	int n = a.row(), times = 0;
 	Colvec <T> now = b, last(n);
 	do{
@@ -570,12 +572,12 @@ Colvec <T> Gauss_Seidel(const Matrix <T> & a, const Colvec <T> & b, const T & ep
 			now[i] /= -a[i][i];
 		}
 	}while(vert_2(last - now) >= eps);
-	// cout << "times = " << times << endl;
+	cout << "times = " << times << endl;
 	return now;
 }
 
 template <class T>
-Colvec <T> SOR(const Matrix <T> & a, const Colvec <T> & b, const T & w, const T & eps) {
+Colvec <T> SOR(const Matrix <T> & a, const Colvec <T> & b, const T & w, const T & eps = 1e-12) {
 	int n = a.row(), times = 0;
 	Colvec <T> now = b, last(n);
 	do{
@@ -936,3 +938,4 @@ Colvec <T> eigen_vec(Colvec <T> & a, Colvec <T> & b, const T lmd, const T eps = 
 	}
 	return y;
 }
+#endif
