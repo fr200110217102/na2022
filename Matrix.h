@@ -342,10 +342,10 @@ Colvec <T> Gauss_Solve(const Matrix <T> & a, const Colvec <T> & b) {
 }
 
 template <class T>
-pair <Matrix <T>, Colvec<int> > Gauss_Improved(const Matrix <T> & _a) {
+pair <Matrix <T>, vector<int> > Gauss_Improved(const Matrix <T> & _a) {
 	Matrix <T> a = _a;
 	int n = _a.row();
-	Colvec <int> p(n);
+	vector <int> p(n);
 	for(int i = 0; i < n; ++ i) p[i] = i;
 	for(int k = 0; k < n; ++ k){
 		int o = k;
@@ -355,10 +355,13 @@ pair <Matrix <T>, Colvec<int> > Gauss_Improved(const Matrix <T> & _a) {
 			for(int j = 0; j < n; ++ j) swap(a[o][j], a[k][j]);
 			swap(p[k], p[o]);
 		}
+		vector<int> cols;
+		for(int j = k; j < n; ++ j) if (a[k][j]) cols.push_back(j);
 		for(int i = k+1; i < n; ++ i) {
+			if (!a[i][k]) continue;
 			a[i][k] /= a[k][k];
-			for(int j = k+1; j < n; ++ j)
-				a[i][j] -= a[i][k] * a[k][j];
+			for(int j = 1; j < cols.size(); ++ j)
+				a[i][cols[j]] -= a[i][k] * a[k][cols[j]];
 		}
 	}
 	return make_pair(a, p);
@@ -366,7 +369,7 @@ pair <Matrix <T>, Colvec<int> > Gauss_Improved(const Matrix <T> & _a) {
 
 template <class T>
 Colvec <T> Gauss_Improved_Solve(const Matrix <T> & _a, const Colvec <T> & _b){
-	pair <Matrix <T>, Colvec <int> > gs = Gauss_Improved(_a);
+	pair <Matrix <T>, vector <int> > gs = Gauss_Improved(_a);
 	Colvec <T> b = _b;
 	int n = _a.row();
 	for(int i = 0; i < n; ++ i) b[i] = _b[gs.second[i]];

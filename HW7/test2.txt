@@ -1,0 +1,156 @@
+Domain : Normal
+Condition : DDDD
+n = 8, h = 0.111111
+Solution Error In L_1 : 0.00015138
+Solution Error In L_2 : 0.000206442
+Solution Error In L_max : 0.00043333
+Domain : Normal
+Condition : DDDD
+n = 16, h = 0.0588235
+Solution Error In L_1 : 4.63428e-05
+Solution Error In L_2 : 6.0067e-05
+Solution Error In L_max : 0.00012174
+Domain : Normal
+Condition : DDDD
+n = 32, h = 0.030303
+Solution Error In L_1 : 1.29476e-05
+Solution Error In L_2 : 1.63241e-05
+Solution Error In L_max : 3.2425e-05
+Domain : Normal
+Condition : DDDD
+n = 64, h = 0.0153846
+Solution Error In L_1 : 3.43263e-06
+Solution Error In L_2 : 4.26501e-06
+Solution Error In L_max : 8.36143e-06
+Domain : Normal
+Condition : NNNN
+n = 8, h = 0.111111
+Solution Error In L_1 : 0.00662852
+Solution Error In L_2 : 0.00825735
+Solution Error In L_max : 0.0313179
+Domain : Normal
+Condition : NNNN
+n = 16, h = 0.0588235
+Solution Error In L_1 : 0.00178655
+Solution Error In L_2 : 0.00225242
+Solution Error In L_max : 0.0111494
+Domain : Normal
+Condition : NNNN
+n = 32, h = 0.030303
+Solution Error In L_1 : 0.000459016
+Solution Error In L_2 : 0.000580543
+Solution Error In L_max : 0.00360928
+Domain : Normal
+Condition : NNNN
+n = 64, h = 0.0153846
+Solution Error In L_1 : 0.000115779
+Solution Error In L_2 : 0.00014636
+Solution Error In L_max : 0.00110263
+Domain : Normal
+Condition : DDNN
+n = 8, h = 0.111111
+Solution Error In L_1 : 0.003338
+Solution Error In L_2 : 0.00495371
+Solution Error In L_max : 0.013836
+Domain : Normal
+Condition : DDNN
+n = 16, h = 0.0588235
+Solution Error In L_1 : 0.000905271
+Solution Error In L_2 : 0.00132178
+Solution Error In L_max : 0.00381719
+Domain : Normal
+Condition : DDNN
+n = 32, h = 0.030303
+Solution Error In L_1 : 0.000234197
+Solution Error In L_2 : 0.000338518
+Solution Error In L_max : 0.000999737
+Domain : Normal
+Condition : DDNN
+n = 64, h = 0.0153846
+Solution Error In L_1 : 5.94301e-05
+Solution Error In L_2 : 8.54001e-05
+Solution Error In L_max : 0.000255204
+Domain : Irnormal
+Condition : DDDDD
+n = 8, h = 0.111111
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 8.3982e-05
+Solution Error In L_2 : 0.000104569
+Solution Error In L_max : 0.000271043
+Domain : Irnormal
+Condition : DDDDD
+n = 16, h = 0.0588235
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 1.61146e-05
+Solution Error In L_2 : 1.81626e-05
+Solution Error In L_max : 5.22597e-05
+Domain : Irnormal
+Condition : DDDDD
+n = 32, h = 0.030303
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 3.67565e-06
+Solution Error In L_2 : 4.29483e-06
+Solution Error In L_max : 9.16385e-06
+Domain : Irnormal
+Condition : DDDDD
+n = 64, h = 0.0153846
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 8.99052e-07
+Solution Error In L_2 : 1.08141e-06
+Solution Error In L_max : 2.45361e-06
+Domain : Irnormal
+Condition : NNNNN
+n = 8, h = 0.111111
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 0.0109127
+Solution Error In L_2 : 0.0118266
+Solution Error In L_max : 0.0237979
+Domain : Irnormal
+Condition : NNNNN
+n = 16, h = 0.0588235
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 0.00254452
+Solution Error In L_2 : 0.00283307
+Solution Error In L_max : 0.00803528
+Domain : Irnormal
+Condition : NNNNN
+n = 32, h = 0.030303
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 0.000730502
+Solution Error In L_2 : 0.000820153
+Solution Error In L_max : 0.00281708
+Domain : Irnormal
+Condition : NNNNN
+n = 64, h = 0.0153846
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 0.000186407
+Solution Error In L_2 : 0.000210388
+Solution Error In L_max : 0.000883124
+Domain : Irnormal
+Condition : DDNNN
+n = 8, h = 0.111111
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 0.00493098
+Solution Error In L_2 : 0.00709381
+Solution Error In L_max : 0.0155396
+Domain : Irnormal
+Condition : DDNNN
+n = 16, h = 0.0588235
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 0.00108163
+Solution Error In L_2 : 0.00161117
+Solution Error In L_max : 0.00401159
+Domain : Irnormal
+Condition : DDNNN
+n = 32, h = 0.030303
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 0.000330665
+Solution Error In L_2 : 0.000490691
+Solution Error In L_max : 0.00123625
+Domain : Irnormal
+Condition : DDNNN
+n = 64, h = 0.0153846
+Circle : O = (0.5, 0.5), r = 0.2
+Solution Error In L_1 : 8.34601e-05
+Solution Error In L_2 : 0.000124932
+Solution Error In L_max : 0.00032329

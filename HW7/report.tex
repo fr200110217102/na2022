@@ -1,0 +1,898 @@
+\documentclass{ctexart}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\newfontfamily\courier{Courier New}
+\lstset{linewidth=1.1\textwidth,
+        numbers=left, %设置行号位置 
+        basicstyle=\small\courier,
+        numberstyle=\tiny\courier, %设置行号大小  
+        keywordstyle=\color{blue}\courier, %设置关键字颜色  
+        %identifierstyle=\bf，
+        commentstyle=\it\color[cmyk]{1,0,1,0}\courier, %设置注释颜色 
+        stringstyle=\it\color[RGB]{128,0,0}\courier,
+        %framexleftmargin=10mm,
+        frame=single, %设置边框格式  
+        backgroundcolor=\color[RGB]{245,245,244},
+        %escapeinside=``, %逃逸字符(1左面的键)，用于显示中文  
+        breaklines, %自动折行  
+        extendedchars=false, %解决代码跨页时，章节标题，页眉等汉字不显示的问题  
+        xleftmargin=2em,xrightmargin=2em, aboveskip=1em, %设置边距  
+        tabsize=4, %设置tab空格数  
+        showspaces=false %不显示空格  
+        basicstyle=\small\courier
+       }  
+\title{微分方程数值解 - 第七章上机作业}
+\author{樊睿 强基数学 2001 班}
+\date{2023年3月24日}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    本项目实现了对规则区域（以 $[0,1]^2$ 为例）和非规则区域（以 $[0,1]^2\setminus D$ 为例）上Poisson方程的Dirichlet和Neumann边值问题的有限差分法求解。
+\end{abstract}
+
+\section{规则区域的Poisson方程}
+
+\begin{equation}
+	-u_{xx}-u_{yy} = f,u\in \Omega=[0,1]^2
+\end{equation}
+
+\subsection{差分格式}
+
+将 $[0,1]^2$ 用等距的 $(n+1)\times (n+1)$ 网格划分，每个小网格的边长记为 $h=\dfrac 1{n+1}$。
+
+将求解未知函数 $u$ 的问题转化为求解 $u$ 在网格点 $u(ih,jh)$ （$0\leq i\leq n+1,0\leq j\leq n+1$，且 $i,j$ 不同时为 $0$ 或 $n+1$）处的值的问题。
+
+进而可以通过插值等方法求出 $u$ 在区域内任意一点的值。
+
+根据 Poisson 方程的差分格式，有
+
+\begin{equation}
+	\dfrac 1{h^2}(4u(ih,jh)-u((i-1)h,jh)-u((i+1)h-jh)-u(ih,(j-1)h)-u(ih,(j+1)h)) = f(ih,jh).
+\end{equation}
+
+其中 $1\leq i,j\leq n$。
+
+这样就得到了所有内部网格点的差分格式。边界点的差分格式将通过具体的边界条件给出。
+
+\subsection{Dirichlet边界条件}
+
+\begin{equation}
+    u|_{\partial \Omega} = g
+\end{equation}
+
+将边界条件离散到矩形边界的格点上，有
+
+\begin{align}
+	u(ih,0) = g(ih,0),1\leq i\leq n,\\
+	u(ih,1) = g(ih,1),1\leq i\leq n,\\
+	u(0,jh) = g(0,jh),1\leq j\leq n,\\
+	u(1,jh) = g(1,jh),1\leq j\leq n.
+\end{align}
+
+将边界条件与内部网格点的差分格式联立，求解关于各网格点函数值的线性方程组即可。
+
+根据教材Exercise 7.40可知，该差分格式的误差为 $O(h^2)$。
+
+\subsection{Neumann边界条件}
+
+\begin{equation}
+    \dfrac{\partial u}{\partial n}|_{\partial \Omega} = g.
+\end{equation}
+
+因为是规则区域，所以法向导数的方向均为水平或竖直的。但因为区域外部的函数是没有定义的，所以只能用区域内部的点来估计。根据 Example 6.38 的一阶差分格式可得：
+
+\begin{align}
+    \dfrac 1{2h}(-3u(ih,0)+4u(ih,h)-u(ih,2h)) = g(ih,0),\\
+    \dfrac 1{2h}(-3u(ih,1)+4u(ih,1-h)-u(ih,1-2h)) = g(ih,1),\\
+    \dfrac 1{2h}(-3u(0,jh)+4u(h,jh)-u(2h,jh)) = g(0,jh),\\
+    \dfrac 1{2h}(-3u(1,jh)+4u(1-h,jh)-u(1-2h,jh)) = g(1,jh).
+\end{align}
+
+将边界条件与内部网格点的差分格式联立，得到的方程组是奇异的（恰有一个冗余方程），这个结果恰和 Neumann 边界条件解中的任意常数 $C$ 对应。
+
+为解决这个问题，可直接将矩阵对角线上的某个系数加 $1$ 破坏奇异性。
+
+根据教材Exercise6.42 可知，该差分格式在边界点处的LTE为 $O(h^2)$。它在内部点处的LTE也是 $O(h^2)$。
+
+$\Vert A^{-1}\Vert_2=O(1)$。因此，算法总体误差 $O(h^2)$。
+
+\section{非规则区域的Poisson方程}
+
+\begin{equation}
+    -u_{xx}-u_{yy} = f,u\in \Omega=[0,1]^2\setminus D.
+\end{equation}
+
+约定其中 $D$ 是一个完全包含在 $[0,1]^2$ 中的圆，且其边界与 $[0,1]^2$ 的距离至少为 $2h$。
+
+\subsection{差分格式}
+
+将 $[0,1]^2$ 用等距的 $(n+1)\times (n+1)$ 网格划分，每个小网格的边长记为 $h=\dfrac 1{n+1}$。
+
+和规则区域相比，不规则区域主要有以下两个问题：
+
+\begin{itemize}
+    \item 部分网格点可能不在区域内，我们不关心这些点的值（或者说这些点的值是“非法的”），所以也不能把它们引入方程。
+    \item 非规则边界与网格的交点不一定是网格点，我们要将非规则边界条件离散到这些点上。以这些点来代替那些不在区域内的的点来对区域内部的点的Poisson方程进行差分。
+\end{itemize}
+
+我们分别考虑 $u_{xx}$ 和 $u_{yy}$ 的差分格式。
+
+设 $(ih,jh)=(x,y)$ 是一个内部格点。
+
+因为区域非规则，所以 $(x-h,y)$ 和 $(x+h,y)$ 不一定在区域内部。设其左右两侧的格点分别为 $(x-\alpha h,y)$ 和 $(x+\beta h,y)$。
+
+考虑用这三个格点的值对 $u_{xx}$ 进行插值。我们设
+
+\begin{equation}
+    u_{xx}(x,y) = au(x,y) + b(x-\alpha h,y) + c(x+\beta h,y) + o(h^2).
+\end{equation}
+
+则
+
+\begin{equation}
+    \begin{bmatrix}
+        1 & 1 & 1 \\
+        0 & -\alpha h & \beta h \\
+        0 & \dfrac{\alpha^2h^2}2 & \dfrac{\beta^2h^2}2
+    \end{bmatrix}
+    \begin{bmatrix}
+        a\\
+        b\\
+        c
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        0\\
+        0\\
+        1
+    \end{bmatrix}.
+\end{equation}
+
+解得
+
+\begin{equation}
+    \begin{bmatrix}
+        a\\
+        b\\
+        c
+    \end{bmatrix}
+    =
+    \dfrac 2{(\alpha+\beta)\alpha\beta h^2}
+    \begin{bmatrix}
+        \alpha + \beta \\
+        -\beta \\
+        -\alpha
+    \end{bmatrix}.
+\end{equation}
+
+同理可以插值 $u_{yy}$。
+
+这样就建立了内部网格点的Poisson方程的差分格式。
+
+\subsection{Dirichlet边界条件}
+
+Dirichlet边界条件比较简单，直接对所有边界上的离散点列出 $u(x,y)=g(x,y)$ 即可。
+
+根据教材Exercise 7.63，上述差分格式的在非正则点（即周围有非网格点）处的LTE为 $O(h)$，其他点处LTE为 $O(h^2)$。但总体误差是 $O(h^2)$。
+
+\subsection{Neumann边界条件}
+
+非规则Neumann边界条件的处理是整个项目中最困难的部分。
+
+为保证边界点处 $O(h^2)$ 的LTE，我们必须设计 $\dfrac {\partial u}{\partial n} = u_x\cos\alpha + u_y\sin\alpha$ 的二阶差分格式。
+
+即我们要满足 $u(x,y) = L_h(x,y) + o(h^2)$。
+
+注意到 $u(x,y)$ 关于 $x,y$ 的二阶泰勒展开有 $6$ 项，因此我们要设计一个 $6$ 个点的差分格式。
+
+我们以非规则边界点为 $(x,y)=(ih,y),x>x_O,y>y_O$ 为例（共8种情况，需分别讨论）。
+
+设 $(ih,jh)$ 为在 $(ih,y)$ 且距离 $(ih,y)$ 最近的网格点。设 $(ih,jh) = (x,y+\theta h)$。则
+
+\begin{equation}
+\begin{split}
+    \dfrac{\partial u}{\partial n}(x,y) &= c_0u(x,y) + c_1u(x,y+\theta h) + c_2u(x,y+(1+\theta)h) \\ &+ c_3u(x+h,y+\theta h) + c_4u(x+h,y+(1+\theta)h)\\ &+ c_5u(x+2h,y+\theta h) + o(h^2).
+\end{split}
+\end{equation}
+
+则有
+
+\begin{equation}
+    \begin{bmatrix}
+        1 & 1 & 1 & 1 & 1 & 1 \\
+        0 & 0 & 0 & h & h & 2h \\
+        0 & \theta h & (1+\theta)h & \theta h & (1+\theta)h & \theta h \\
+        0 & 0 & 0 & \dfrac {h^2}2 & \dfrac {h^2}2 & 2h^2 \\
+        0 & \dfrac {\theta^2h^2}2 & \dfrac {(1+\theta h)^2h^2}2 & \dfrac {\theta^2h^2}2 & \dfrac {(1+\theta h)^2h^2}2 & \dfrac {\theta^2h^2}2\\
+        0 & 0 & 0 & \theta h^2 & (1+\theta)h^2 & 2\theta h^2\\
+    \end{bmatrix}
+    \begin{bmatrix}
+        c_0\\
+        c_1\\
+        c_2\\
+        c_3\\
+        c_4\\
+        c_5
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        0\\
+        \cos\alpha\\
+        \sin\alpha\\
+        0\\
+        0\\
+        0\\
+    \end{bmatrix}.
+\end{equation}
+
+这个方程手算求解比较困难，求解八个方程计算量过大，因此在程序设计时，采用构造矩阵并运行高斯消元法求解 6 阶线性方程组的方法求出系数。
+
+\section{程序设计细节}
+
+\subsection{二元函数的实现}
+
+类似第一章一元函数的实现，设计 \verb|Function_2D| 抽象类，实现二元函数的求函数值和求偏导数值。详见文件目录中 \verb|function.h|。
+
+\begin{lstlisting}[language={c++}]
+#ifndef FUNCTION
+#define FUNCTION
+const double delta = 1e-8;
+template <class type>
+class Function{
+public:
+	virtual type operator ()(const type& x) const = 0;
+	virtual type d(const type& x, const int& k = 1) const {
+		if (k == 1) return ((*this)(x+delta) - (*this)(x-delta)) / (2*delta);
+		if (k == 2) return ((*this)(x+delta) - 2*(*this)(x) + (*this)(x-delta)) / (delta*delta);
+		throw 0;
+	}
+};
+template <class type>
+class Function_2D{
+public:
+	virtual type operator ()(const type& x, const type& y) const = 0;
+	virtual type partial(const type& x, const type& y, const int& i, const int& j) const {
+		if (i == 1 && j == 0) return ((*this)(x+delta, y) - (*this)(x-delta, y)) / (2*delta);
+		if (i == 2 && j == 0) return ((*this)(x+delta, y) - 2*(*this)(x, y) + (*this)(x-delta, y))/ (delta*delta);
+		if (i == 0 && j == 1) return ((*this)(x, y+delta) - (*this)(x, y-delta)) / (2*delta);
+		if (i == 0 && j == 2) return ((*this)(x, y+delta) - 2*(*this)(x, y) + (*this)(x, y-delta))/ (delta*delta);
+		throw 0;
+	}
+};
+#endif
+\end{lstlisting}
+
+\subsection{平面几何的程序实现}
+
+本题需要一些平面向量和圆的基本运算。例如向量的加减，圆和水平竖直直线的交点、判断点是否在圆内等。
+
+因为机器误差，两个相等的点可能在一系列运算之后相差一个机器精度级别的小量。因此我们定义 \verb|sgn| 函数，当两个实数相差不超过 $10^{-12}$ 时，就认为它们是相等的（这其实是一个危险的操作，因为模糊的 \verb|<| 运算可能会导致序关系混乱。本次作业运算比较简单，相等的点误差不会太大，所以不会出现这种情况）。同理当一个点和圆周的距离不超过 $10^{-12}$ 时，就认为它在圆上。详见文件目录中 \verb|geo_2D.h|。
+
+\begin{lstlisting}[language={c++}]
+#ifndef GEO2D
+#define GEO2D
+#include <bits/stdc++.h>
+#include "function.h"
+using namespace std;
+
+inline int sgn(double x) {
+	if (fabs(x) < 1e-12) return 0;
+	return x>0 ? 1 : -1;
+}
+
+struct vec {
+	double x,y;
+	vec() {}
+	vec(double x,double y):x(x),y(y){}
+	vec operator + (const vec& p) const {
+		return vec(x+p.x, y+p.y);
+	}
+	vec operator - (const vec& p) const {
+		return vec(x-p.x, y-p.y);
+	}
+	double norm() const {
+		return sqrt(x*x + y*y);
+	}
+	bool operator < (const vec& p) const {
+		return sgn(x-p.x) == -1 || (sgn(x-p.x) == 0 && sgn(y-p.y) == -1);
+	}
+	bool operator == (const vec& p) const {
+		return sgn(x-p.x) == 0 && sgn(y-p.y) == 0;
+	}
+};
+typedef vec pnt;
+
+inline double dis(const pnt& p, const pnt& q) {
+	return (p-q).norm();
+}
+
+struct circle {
+	pnt o;
+	double r;
+	circle(double x=0, double y=0, double r=0) : o(x,y), r(r) {}
+	double Y1(const double& x) const {return o.y - sqrt(max(0.0, r*r - (x-o.x)*(x-o.x)));}
+	double Y2(const double& x) const {return o.y + sqrt(max(0.0, r*r - (x-o.x)*(x-o.x)));}
+	double X1(const double& y) const {return o.x - sqrt(max(0.0, r*r - (y-o.y)*(y-o.y)));}
+	double X2(const double& y) const {return o.x + sqrt(max(0.0, r*r - (y-o.y)*(y-o.y)));}
+	double arg(const pnt& p) const {return atan2(p.x-o.x, p.y-o.y);}
+};
+
+inline int pnt_to_circle(const pnt &p, const circle &c) {
+	return sgn(dis(p, c.o) - c.r);
+}
+#endif
+\end{lstlisting}
+
+\subsection{数值代数部分}
+
+自编函数库。主要用到了矩阵类\verb|Matrix|、列向量类\verb|Colvec|和列主元高斯消元\verb|Gauss_Improved_Solve|。详见 \verb|Matrix.h|。由于代码过长，不在此给出完整代码。
+
+\subsection{BVPSolver抽象类}
+
+定义 BVPSolver 抽象类，所有 BVPSolver 都是它的派生。
+
+\begin{lstlisting}[language={c++}]
+#ifndef BVPSOLVER
+#define BVPSOLVER
+#include <bits/stdc++.h>
+#include "function.h"
+using namespace std;
+
+class BVPSolver {
+protected:
+	virtual void ID_Generator() = 0;
+	virtual void Matrix_Generator() = 0;
+public:
+	virtual void Solve() = 0;
+	virtual void Summary(Function_2D<double>&, bool detail) = 0;
+};
+#endif
+\end{lstlisting}
+
+BVPSolver的基本设计思路：
+
+成员变量 \verb|int n|、\verb|Function_2D<double>&f,&g| 和 \verb|string cond|（边界条件）由调用者给出，$h=\dfrac 1{n+1}$。
+
+成员变量 \verb|map<pnt,int> id| 是网格点以及边界离散点的编号。
+
+成员变量 \verb|Matrix<double> coef| \verb|Colvec<double> rhs| 分别表示离散后的线性方程组的系数矩阵和右端向量，\verb|Colvec<double> sol|为线性方程组的解。
+
+成员函数 \verb|ID_Generator()| 计算所有网格点和边界离散点并生成编号。
+
+成员函数 \verb|Matrix_Generator()| 生成系数矩阵和右端项。
+
+成员函数 \verb|Solver()| 先生成编号，再生成系数矩阵和右端项，最后调用高斯消元法解方程。
+
+成员函数 \verb|Summary(Function_2D<double>&, bool detail = 0)|输入真值，输出BVP的区域、边界条件、网格密度和误差。\verb|detail=1| 则输出所有离散点及对应的值。
+
+很明显，最难的部分在于 \verb|Matrix_Generator()| 函数。
+
+\subsection{规则区域BVPSolver}
+
+构造函数的参数为\verb|n,f,g,cond|。分别是每行（每列）网格数量、右端函数、边界函数和边界条件。\verb|cond|是一个长为4的字符串，依次为正方形的下、左、上、右边界的边界条件。
+
+按前面的设计思路，先将除四个角外的所有网格点进行标号。
+
+定义辅助函数 \verb|Laplace_Normal_Discretor(pnt p0, pnt p1, pnt p2, pnt p3, pnt p4)|，建立一个Poisson方程在一个内部点\verb|p0|处的离散方程。\verb|p1,p2,p3,p4|是它左右上下的四个相邻的网格点。
+
+再定义辅助函数 \verb|Dirichlet_Normal_Discretor(pnt p0)| 和 \verb|Neumann_Normal_Discretor(pnt p0, pnt p1, pnt p2)|，分别是建立Dirichlet和Neumann边界条件在边界点\verb|p0|处的离散方程。\verb|p1|和\verb|p2|是与边界点差 $h$ 和 $2h$ 的内部点。
+
+这样我们就能解决规则区域的任意（同一边边界条件类型相同的）混合问题。
+
+\begin{lstlisting}[language={c++}]
+#include <bits/stdc++.h>
+#include "function.h"
+#include "../Matrix.h"
+#include "BVPSolver.h"
+using namespace std;
+
+class Normal_BVPSolver : public BVPSolver{
+private:
+    int n, d;
+    double h;
+    Function_2D<double> &f, &g;
+    Matrix<double> coef;
+    Colvec<double> rhs;
+    Colvec<double> sol;
+    map<pnt, int> id;
+    vector<pnt> ps;
+    string cond;
+    void ins(pnt p) {
+        if(!id.count(p)) id[p] = d++, ps.push_back(p);
+    }
+    void ID_Generator() {
+        for (int i = 0; i <= n+1; ++ i)
+            for (int j = 0; j <= n+1; ++ j)
+                if (i!=0&&i!=n+1 || j!=0&&j!=n+1)
+                    ins(pnt(i*h,j*h));
+    }
+    void Laplace_Normal_Discretor(pnt p0, pnt p1, pnt p2, pnt p3, pnt p4) {
+        int i0 = id[p0], i1 = id[p1], i2 = id[p2], i3 = id[p3], i4 = id[p4];
+        coef[i0][i0] += 4 / (h*h);
+        coef[i0][i1] -= 1 / (h*h);
+        coef[i0][i2] -= 1 / (h*h);
+        coef[i0][i3] -= 1 / (h*h);
+        coef[i0][i4] -= 1 / (h*h);
+        rhs[i0] = f(p0.x, p0.y);
+    }
+    void Dirichlet_Normal_Discretor(pnt p0) {
+        int i0 = id[p0];
+        coef[i0][i0] = 1;
+        rhs[i0] = g(p0.x, p0.y);
+    }
+    void Neumann_Normal_Discretor(pnt p0, pnt p1, pnt p2) {
+        int i0 = id[p0], i1 = id[p1], i2 = id[p2];
+        coef[i0][i0] -= 1.5 / h;
+        coef[i0][i1] += 2 / h;
+        coef[i0][i2] -= 0.5 / h;
+        rhs[i0] = g(p0.x, p0.y);
+    }
+    void Matrix_Generator() {
+        coef = Matrix<double> (d, d);
+        rhs = Colvec<double> (d);
+        for (int i = 1; i <= n; ++ i)
+            for (int j = 1; j <= n; ++ j) 
+                Laplace_Normal_Discretor(pnt(i*h,j*h), pnt((i-1)*h,j*h), pnt((i+1)*h,j*h), pnt(i*h,(j-1)*h), pnt(i*h,(j+1)*h));
+        for (int i = 1; i <= n; ++ i)
+            if (cond[0] == 'D') Dirichlet_Normal_Discretor(pnt(i*h, 0));
+            else Neumann_Normal_Discretor(pnt(i*h, 0), pnt(i*h, h), pnt(i*h, 2*h));
+
+        for (int j = 1; j <= n; ++ j)
+            if (cond[1] == 'D') Dirichlet_Normal_Discretor(pnt(0, j*h));
+            else Neumann_Normal_Discretor(pnt(0, j*h), pnt(h, j*h), pnt(2*h, j*h));
+
+        for (int i = 1; i <= n; ++ i)
+            if (cond[2] == 'D') Dirichlet_Normal_Discretor(pnt(i*h, 1));
+            else Neumann_Normal_Discretor(pnt(i*h, 1), pnt(i*h, 1-h), pnt(i*h, 1-2*h));
+            
+        for (int j = 1; j <= n; ++ j)
+            if (cond[3] == 'D') Dirichlet_Normal_Discretor(pnt(1, j*h));
+            else Neumann_Normal_Discretor(pnt(1, j*h), pnt(1-h, j*h), pnt(1-2*h, j*h));
+        
+        if (cond == "NNNN") coef[0][0] += 1;
+    }
+public:
+    Normal_BVPSolver(int n, Function_2D<double>& f, Function_2D<double>& g, const string& s) :
+        n(n), d(0), h(1.0/(n+1)), f(f), g(g), cond(s) {}
+    void Solve() {
+        ID_Generator();
+        Matrix_Generator();
+        sol = Gauss_Improved_Solve(coef, rhs);
+    }
+    void Summary(Function_2D<double>& u, bool detail = 0) {
+        cout << "Domain : Normal" << endl;
+        cout << "Condition : " << cond << endl;
+        cout << "n = " << n << ", h = " << h << endl;
+        cout << "Values :" << endl;
+        double C = 0;
+        if (cond == "NNNN") {
+            for (int i = 0; i < d; ++ i) C += sol[i] - u(ps[i].x, ps[i].y);
+            C /= d;
+        }
+        double res1 = 0, res2 = 0, resm = 0;
+        int cnt = 0;
+        for (int i = 0; i <= n+1; ++ i)
+            for (int j = 0; j <= n+1; ++ j) if (i!=0&&i!=n+1 || j!=0&&j!=n+1) {
+                ++cnt;
+                double uij = sol[id[pnt(i*h,j*h)]], uij_real = u(i*h, j*h);
+                double eij = fabs(uij - C - uij_real);
+                res1 += eij;
+                res2 += eij*eij;
+                resm = max(resm, eij);
+                cout << "(" << i*h << ", " << j*h << "), " << "Solution Value : " << uij << ", Real Value : " << uij_real << endl;
+            }
+        res1 /= cnt, res2 /= cnt, res2 = sqrt(res2);
+        cout << "Solution Error In L_1 : " << res1 << endl;
+        cout << "Solution Error In L_2 : " << res2 << endl;
+        cout << "Solution Error In L_max : " << resm << endl;
+    }
+};
+\end{lstlisting}
+
+\subsection{非规则区域BVPSolver}
+
+按前面的设计思路，先将所有在圆外的网格点以及圆和网格的交点标号。
+
+定义辅助函数 \verb|void Laplace_Irnormal_Discretor(pnt p0, pnt p1, pnt p2, pnt p3, pnt p4)|，建立一个Poisson方程在一个内部点\verb|p0|处的离散方程。\verb|p1,p2,p3,p4|是它左右上下的四个相邻的网格点或边界离散点。
+
+对于正方形边界上的离散点，直接调用规则区域BVPSolver定义的两个边界离散函数即可。
+
+对于圆边界上的离散点，如果是Dirichlet边界条件，仍调用前面定义的边界离散函数即可。
+
+再定义辅助函数 \verb|void Neumann_Irnormal_Discretor(pnt p0, pnt p1, pnt p2, pnt p3, pnt p4, pnt p5)|，建立一个Neumann边界条件在圆上边界点\verb|p0|处的离散方程。\verb|p1,p2,p3,p4,p5|如前文对应章节所述。
+
+\begin{lstlisting}[language={c++}]
+#include <bits/stdc++.h>
+#include "function.h"
+#include "geo_2D.h"
+#include "../Matrix.h"
+#include "BVPSolver.h"
+using namespace std;
+
+class Irnormal_BVPSolver : public BVPSolver{
+private:
+	int n, d;
+	circle D;
+	double h;
+	Function_2D<double> &f, &g;
+	Matrix<double> coef;
+	Colvec<double> rhs;
+	Colvec<double> sol;
+	map<pnt, int> id;
+	vector<pnt> ps;
+	string cond;
+	void ins(pnt p) {
+		if(!id.count(p)) id[p] = d++, ps.push_back(p);
+	}
+	void ID_Generator() {
+		for (int i = 1; i <= n; ++ i)
+			for (int j = 1; j <= n; ++ j)
+				if (pnt_to_circle(pnt(i*h, j*h), D) >= 0) 
+					ins(pnt(i*h, j*h));
+		for (int i = 1; i <= n ;++ i) {
+			ins(pnt(0, i*h));
+			ins(pnt(1, i*h));
+			ins(pnt(i*h, 0));
+			ins(pnt(i*h, 1));
+		}
+		for (int i = 1; i <= n; ++ i)
+			if (sgn(i*h - (D.o.x-D.r)) * sgn(i*h - (D.o.x+D.r)) <= 0) {
+				ins(pnt(i*h, D.Y1(i*h)));
+				ins(pnt(i*h, D.Y2(i*h)));
+			}
+		for (int j = 1; j <= n; ++ j)
+			if (sgn(j*h - (D.o.y-D.r)) * sgn(j*h - (D.o.y+D.r)) <= 0) {
+				ins(pnt(D.X1(j*h), j*h));
+				ins(pnt(D.X2(j*h), j*h));
+			}
+	}
+	void Laplace_Irnormal_Discretor(pnt p0, pnt p1, pnt p2, pnt p3, pnt p4) {
+		int i0 = id[p0], i1 = id[p1], i2 = id[p2], i3 = id[p3], i4 = id[p4];
+		double lt = (p0.x - p1.x) / h, rt = (p2.x - p0.x) / h;
+		double dt = (p0.y - p3.y) / h, ut = (p4.y - p0.y) / h;
+		coef[i0][i0] += (lt+rt) / ((lt+rt)*lt*rt*h*h/2);
+		coef[i0][i1] -= rt / ((lt+rt)*lt*rt*h*h/2);
+		coef[i0][i2] -= lt / ((lt+rt)*lt*rt*h*h/2);
+		coef[i0][i0] += (dt+ut) / ((dt+ut)*dt*ut*h*h/2);
+		coef[i0][i3] -= ut / ((dt+ut)*dt*ut*h*h/2);
+		coef[i0][i4] -= dt / ((dt+ut)*dt*ut*h*h/2);
+		rhs[i0] = f(p0.x, p0.y);
+	}
+	void Dirichlet_Discretor(pnt p0) {
+		int i0 = id[p0];
+		coef[i0][i0] = 1;
+		rhs[i0] = g(p0.x, p0.y);
+	}
+	void Neumann_Normal_Discretor(pnt p0, pnt p1, pnt p2) {
+		int i0 = id[p0], i1 = id[p1], i2 = id[p2];
+		coef[i0][i0] -= 1.5 / h;
+		coef[i0][i1] += 2 / h;
+		coef[i0][i2] -= 0.5 / h;
+		rhs[i0] = g(p0.x, p0.y);
+	}
+	void Neumann_Irnormal_Discretor(pnt p0, pnt p1, pnt p2, pnt p3, pnt p4, pnt p5) {
+		int i0 = id[p0], i1 = id[p1], i2 = id[p2], i3 = id[p3], i4 = id[p4], i5 = id[p5];
+		Matrix<double> c(6, 6);
+		Colvec<double> b(6);
+		pnt p[6] = {p0, p1, p2, p3, p4, p5};
+		for (int i = 0; i < 6; ++ i) {
+			c[0][i] = 1;
+			c[1][i] = p[i].x-p0.x;
+			c[2][i] = p[i].y-p0.y;
+			c[3][i] = (p[i].x-p0.x) * (p[i].x-p0.x) / 2;
+			c[4][i] = (p[i].y-p0.y) * (p[i].y-p0.y) / 2;
+			c[5][i] = (p[i].x-p0.x) * (p[i].y-p0.y);
+		}
+		double arg = D.arg(p0);
+		b[1] = cos(arg);
+		b[2] = sin(arg);
+		Colvec<double> w = Gauss_Improved_Solve(c, b);
+		coef[i0][i0] = w[0];
+		coef[i0][i1] = w[1];
+		coef[i0][i2] = w[2];
+		coef[i0][i3] = w[3];
+		coef[i0][i4] = w[4];
+		coef[i0][i5] = w[5];
+		rhs[i0] = g(p0.x, p0.y);
+	}
+	void Matrix_Generator() {
+		coef = Matrix<double> (d, d);
+		rhs = Colvec<double> (d);
+		for (int i = 1; i <= n; ++ i)
+			for (int j = 1; j <= n; ++ j) if (pnt_to_circle(pnt(i*h, j*h), D) > 0){
+				pnt p(i*h, j*h);
+				pnt lp((i-1)*h, j*h);
+				pnt rp((i+1)*h, j*h);
+				pnt dp(i*h, (j-1)*h);
+				pnt up(i*h, (j+1)*h);
+				if (pnt_to_circle(lp, D) < 0) lp.x = D.X2(j*h);
+				if (pnt_to_circle(rp, D) < 0) rp.x = D.X1(j*h);
+				if (pnt_to_circle(dp, D) < 0) dp.y = D.Y2(i*h);
+				if (pnt_to_circle(up, D) < 0) up.y = D.Y1(i*h);
+				Laplace_Irnormal_Discretor(p, lp, rp, dp, up);
+			}
+		
+		for (int i = 1; i <= n; ++ i)
+			if (cond[0] == 'D') Dirichlet_Discretor(pnt(i*h, 0));
+			else Neumann_Normal_Discretor(pnt(i*h, 0), pnt(i*h, h), pnt(i*h, 2*h));
+
+		for (int j = 1; j <= n; ++ j)
+			if (cond[1] == 'D') Dirichlet_Discretor(pnt(0, j*h));
+			else Neumann_Normal_Discretor(pnt(0, j*h), pnt(h, j*h), pnt(2*h, j*h));
+
+		for (int i = 1; i <= n; ++ i)
+			if (cond[2] == 'D') Dirichlet_Discretor(pnt(i*h, 1));
+			else Neumann_Normal_Discretor(pnt(i*h, 1), pnt(i*h, 1-h), pnt(i*h, 1-2*h));
+			
+		for (int j = 1; j <= n; ++ j)
+			if (cond[3] == 'D') Dirichlet_Discretor(pnt(1, j*h));
+			else Neumann_Normal_Discretor(pnt(1, j*h), pnt(1-h, j*h), pnt(1-2*h, j*h));
+		
+		if (cond[4] == 'D') {
+			for (int i = 1; i <= n; ++ i) 
+				if (sgn(i*h - (D.o.x-D.r)) * sgn(i*h - (D.o.x+D.r)) == -1) {
+					Dirichlet_Discretor(pnt(i*h, D.Y1(i*h)));
+					Dirichlet_Discretor(pnt(i*h, D.Y2(i*h)));
+				}
+			for (int j = 1; j <= n; ++ j)
+				if (sgn(j*h - (D.o.y-D.r)) * sgn(j*h - (D.o.y+D.r)) == -1) {
+					Dirichlet_Discretor(pnt(D.X1(j*h), j*h));
+					Dirichlet_Discretor(pnt(D.X2(j*h), j*h));
+				}			
+		}
+		else {
+			for (int i = 1, j; i <= n; ++ i)
+				if (sgn(i*h - (D.o.x-D.r)) * sgn(i*h - (D.o.x+D.r)) <= 0) {
+					pnt p(i*h, D.Y1(i*h));
+					int j = int(p.y/h-1e-12);
+					int op = sgn(i*h-D.o.x);
+					if(op == 0) op = 1;
+					pnt p1(i*h, j*h);
+					pnt p2(i*h, (j-1)*h);
+					pnt p3((i+op)*h, j*h);
+					pnt p4((i+op)*h, (j-1)*h);
+					pnt p5((i+2*op)*h, j*h);
+					Neumann_Irnormal_Discretor(p, p1, p2, p3, p4, p5);
+				}
+			for (int i = 1; i <= n; ++ i)
+				if (sgn(i*h - (D.o.x-D.r)) * sgn(i*h - (D.o.x+D.r)) == -1) {
+					pnt p(i*h, D.Y2(i*h));
+					int j = int(p.y/h+1e-12) + 1;
+					int op = sgn(i*h-D.o.x);
+					if (op == 0) op = 1;
+					pnt p1(i*h, j*h);
+					pnt p2(i*h, (j+1)*h);
+					pnt p3((i+op)*h, j*h);
+					pnt p4((i+op)*h, (j+1)*h);
+					pnt p5((i+2*op)*h, j*h);
+					Neumann_Irnormal_Discretor(p, p1, p2, p3, p4, p5);
+				}
+			for (int j = 1; j <= n; ++ j)
+				if (sgn(j*h - (D.o.y-D.r)) * sgn(j*h - (D.o.y+D.r)) <= 0) {
+					pnt p(D.X1(j*h), j*h);
+					int i = int(p.x/h-1e-12);
+					int op = sgn(j*h-D.o.y);
+					if (op == 0) op = 1;
+					pnt p1(i*h, j*h);
+					pnt p2((i-1)*h, j*h);
+					pnt p3(i*h, (j+op)*h);
+					pnt p4((i-1)*h, (j+op)*h);
+					pnt p5(i*h, (j+2*op)*h);
+					Neumann_Irnormal_Discretor(p, p1, p2, p3, p4, p5);
+				}
+			for (int j = 1; j <= n; ++ j)
+				if (sgn(j*h - (D.o.y-D.r)) * sgn(j*h - (D.o.y+D.r)) == -1) {
+					pnt p(D.X2(j*h), j*h);
+					int i = int(p.x/h+1e-12) + 1;
+					int op = sgn(j*h-D.o.y);
+					if (op == 0) op = 1;
+					pnt p1(i*h, j*h);
+					pnt p2((i+1)*h, j*h);
+					pnt p3(i*h, (j+op)*h);
+					pnt p4((i+1)*h, (j+op)*h);
+					pnt p5(i*h, (j+2*op)*h);
+					Neumann_Irnormal_Discretor(p, p1, p2, p3, p4, p5);
+				}
+		}
+		if (cond == "NNNNN") coef[0][0] += 1;
+	}
+public:
+	Irnormal_BVPSolver(int n, Function_2D<double>& f, Function_2D<double>& g, double x0, double y0, double r, const string& s) :
+		n(n), d(0), ps(0), h(1.0/(n+1)), f(f), g(g), D(x0, y0, r), cond(s) {
+			if (r <= h) {
+				cerr << "Too Coarse Grid!" << endl;
+				throw 1;
+			}
+			if (x0 - r <= 2*h || x0 + r >= 1-2*h || y0 - r <= 2*h || y0 + r >= 1-2*h) {
+				cerr << "Circle Outside the Square!" << endl;
+				throw 1;
+			}
+		}
+	void Solve() {
+		ID_Generator();
+		Matrix_Generator();
+		sol = Gauss_Improved_Solve(coef, rhs);
+	}
+	void Summary(Function_2D<double>& u, bool detail = 0) {
+		cout << "Domain : Irnormal" << endl;
+		cout << "Condition : " << cond << endl;
+		cout << "n = " << n << ", h = " << h << endl;
+		cout << "Circle : " << "O = (" << D.o.x << ", " << D.o.y << "), r = " << D.r << endl;
+		if (detail) cout << "Values :" << endl;	
+		double C = 0;
+		for (int i = 0; i < d; ++ i) C += sol[i] - u(ps[i].x, ps[i].y);
+		C /= d;
+		double res1 = 0, res2 = 0, resm = 0;
+		int cnt = 0;
+		for (int i = 1; i <= n; ++ i)
+			for (int j = 1; j <= n; ++ j) if (pnt_to_circle(pnt(i*h, j*h), D) > 0) {
+				++ cnt;
+				double uij = sol[id[pnt(i*h,j*h)]], uij_real = u(i*h, j*h);
+				double eij = fabs(uij - C - uij_real);
+				res1 += eij;
+				res2 += eij*eij;
+				resm = max(resm, eij);
+				if (detail) cout << "(" << i*h << ", " << j*h << "), " << "Solution Value : " << uij << ", Real Value : " << uij_real << endl;
+			}
+		res1 /= cnt, res2 /= cnt, res2 = sqrt(res2);
+		cout << "Solution Error In L_1 : " << res1 << endl;
+		cout << "Solution Error In L_2 : " << res2 << endl;
+		cout << "Solution Error In L_max : " << resm << endl;
+	}
+};
+\end{lstlisting}
+
+\subsection{测试程序}
+
+使用如下三个函数测试：
+
+\begin{align}
+    u(x,y) = \exp\{y+\sin x\}\\
+    u(x,y) = \exp\{-(x^2+y^2)\}\\
+    u(x,y) = \dfrac 1{\sqrt{x^2+y^2}}
+\end{align}
+
+根据拉普拉斯算子和法向导数的定义，定义函数 $f$ 和 $g$。
+
+\begin{lstlisting}
+    #include<bits/stdc++.h>
+    #include "function.h"
+    #include "geo_2D.h"
+    #include "Normal_BVPSolver.h"
+    #include "Irnormal_BVPSolver.h"
+    using namespace std;
+    
+    class U : public Function_2D<double> {
+    public:
+        double operator ()(const double& x, const double& y) const {
+            return exp(y + sin(x));
+        }
+        double partial(const double& x, const double& y, const int& i, const int& j) const {
+            if (i == 0) return exp(y + sin(x));
+            if (i == 1 && j == 0) return cos(x) * exp(y + sin(x));
+            if (i == 2 && j == 0) return (cos(x) * cos(x) - sin(x)) * exp(y + sin(x));
+            throw 0;
+        }
+    } u;
+    
+    class V : public Function_2D<double> {
+    public:
+        double operator ()(const double& x, const double& y) const {
+            return exp(-(x*x+y*y));
+        }
+        double partial(const double& x, const double& y, const int& i, const int& j) const {
+            if (i == 1 && j == 0) return -2 * x * exp(-(x*x+y*y));
+            if (i == 2 && j == 0) return (4*x*x - 2) * exp(-(x*x+y*y));
+            if (i == 0 && j == 1) return -2 * x * exp(-(x*x+y*y));
+            if (i == 0 && j == 2) return (4*y*y - 2) * exp(-(x*x+y*y));
+            throw 0;
+        }
+    } v;
+    
+    class W : public Function_2D<double> {
+    public:
+        double operator ()(const double& x, const double& y) const {
+            return 1/sqrt(x*x+y*y);
+        }
+        double partial(const double& x, const double& y, const int& i, const int& j) const {
+            if (i == 1 && j == 0) return -x / (x*x+y*y) / sqrt(x*x+y*y);
+            if (i == 2 && j == 0) return (2*x*x-y*y) / (x*x+y*y) / (x*x+y*y) / sqrt(x*x+y*y);
+            if (i == 0 && j == 1) return -y / (x*x+y*y) / sqrt(x*x+y*y);
+            if (i == 0 && j == 2) return (2*y*y-x*x) / (x*x+y*y) / (x*x+y*y) / sqrt(x*x+y*y);
+            throw 0;
+        }
+    } w;
+    
+    class F : public Function_2D<double> {
+    public:
+        Function_2D<double>& u;
+        F(Function_2D<double>& u) : u(u) {}
+        double operator ()(const double& x, const double& y) const {
+            return -(u.partial(x, y, 2, 0) + u.partial(x, y, 0, 2));
+        }
+    };
+    
+    class G : public Function_2D<double> {
+    public:
+        Function_2D<double>& u;
+        string cond;
+        G(Function_2D<double>& u, const string& s) : u(u), cond(s) {}
+        double operator ()(const double& x, const double& y) const {
+            if (x == 0) return cond[0] == 'D' ? u(0, y) : u.partial(0, y, 1, 0);
+            if (x == 1) return cond[1] == 'D' ? u(1, y) : -u.partial(1, y, 1, 0);
+            if (y == 0) return cond[2] == 'D' ? u(x, 0) : u.partial(x, 0, 0, 1);
+            if (y == 1) return cond[3] == 'D' ? u(x, 1) : -u.partial(x, 1, 0, 1);
+            throw 0;
+        }
+    };
+    
+    class G1 : public Function_2D<double> {
+    public:
+        Function_2D<double>& u;
+        circle D;
+        string cond;
+        G1(Function_2D<double>& u, double x0, double y0, double r, const string& s) : u(u), D(x0, y0, r), cond(s) {}
+        double operator ()(const double& x, const double& y) const {
+            if (x == 0) return cond[0] == 'D' ? u(0, y) : u.partial(0, y, 1, 0);
+            if (x == 1) return cond[1] == 'D' ? u(1, y) : -u.partial(1, y, 1, 0);
+            if (y == 0) return cond[2] == 'D' ? u(x, 0) : u.partial(x, 0, 0, 1);
+            if (y == 1) return cond[3] == 'D' ? u(x, 1) : -u.partial(x, 1, 0, 1);
+            if (pnt_to_circle(pnt(x,y), D) == 0) {
+                if (cond[4] == 'D') return u(x, y);
+                double arg = D.arg(pnt(x,y));
+                return cos(arg) * u.partial(x, y, 1, 0) + sin(arg) * u.partial(x, y, 0, 1);
+            }
+            throw 0;
+        }
+    };
+    
+    int main(int argc, char** argv){
+        string cmd0 = argv[1], cmd1 = argv[2], cmd2 = argv[3];
+        Function_2D<double>& t = u;
+        if (cmd0 == "v") t = v;
+        if (cmd0 == "w") t = w;
+        int n = atoi(argv[4]);
+        F f(t);
+        if (cmd1 == "Normal") {
+            if (cmd2 == "Dirichlet") cmd2 = "DDDD";
+            if (cmd2 == "Neumann") cmd2 = "NNNN";
+            G g(t, cmd2);
+            Normal_BVPSolver M(n, f, g, cmd2);
+            M.Solve();
+            M.Summary(t);
+        }
+        else {
+            double x0 = atof(argv[5]);
+            double y0 = atof(argv[6]);
+            double r = atof(argv[7]);
+            if (cmd2 == "Dirichlet") cmd2 = "DDDDD";
+            if (cmd2 == "Neumann") cmd2 = "NNNNN";
+            G1 g(t, x0, y0, r, cmd2);
+            Irnormal_BVPSolver MI(n, f, g, x0, y0, r, cmd2);
+            MI.Solve();
+            MI.Summary(t);
+        }
+    }
+\end{lstlisting}
+
+\section{测试数据}
+
+对三个函数、两种区域、三种边界条件、$n=8,16,32,64$ 四种网格密度分别测试。
+
+测试结果见 \verb|text1.txt,text2.txt,text3.txt| 三个文档，每个文档存一个函数的测试结果。
+
+执行 \verb|make run| 即可得到全部结果。
+
+通过对同种区域同种边界条件不同网格密度的比较可知，对于Dirichlet和Mixed边界条件，无论是规则区域还是非规则区域，$n$ 每增大一倍，误差都降为原来的 $\dfrac 14$。即误差是二阶收敛的，比较符合理论。
+
+但对于纯Neumann边界条件，$n$ 每增大一倍，误差仅减小为原来的 $\dfrac 13$。即误差仅 $1.6$ 阶收敛。这是不符合理论的。可能是因为Neumann边界条件得到的方程组接近奇异，导致解方程组本身的误差随着 $n$ 的增大而增大。
+
+\end{document}
