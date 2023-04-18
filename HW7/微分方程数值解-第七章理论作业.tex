@@ -1,0 +1,169 @@
+\documentclass{ctexart}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+
+
+\title{微分方程数值解-第七章理论作业}
+\author{樊睿 强基数学2001班 3200102142}
+\date{March 2023}
+
+\newtheorem{ex}{Exercise}
+\renewcommand{\proofname}{\indent\bf 证明}
+\begin{document}
+
+\maketitle
+
+\begin{ex}
+    设网格函数 $\mathbf{g}:\mathbf{X}\rightarrow \mathbb{R}$ 满足 $\mathbf{X} :=\{x_1,x_2,\dots,x_N\}$，$g_1=O(h),g_N=O(h)$，$g_j=O(h^2),\forall j=2,3,\dots,N-1$，证明：
+    \begin{equation}
+        \Vert{\mathbf{g}}\Vert_\infty = O(h),\Vert{\mathbf{g}}\Vert_1 = O(h^2),\Vert{\mathbf{g}}\Vert_2 = O(h^{\frac 32})
+    \end{equation}
+\end{ex}
+
+\begin{proof}
+    依题意，设 $|g_1|\leq Ch,|g_n|\leq Ch,|g_2|,|g_3|,\dots,|g_{N-1}\leq Ch^2$，$C=O(1)$。则
+    \begin{equation}
+        \Vert{\mathbf{g}}\Vert_\infty = \max_{j=1}^N|g_j|\leq Ch = O(h).
+    \end{equation}
+    \begin{equation}
+        \Vert{\mathbf{g}}\Vert_1 = h\sum_{j=1}^N|g_j| \leq h(2Ch+(N-2)h^2)\leq 3Ch^2 = O(h^2).
+    \end{equation}
+    \begin{equation}
+        \Vert{\mathbf{g}}\Vert_2 = (h\sum_{j=1}^N|g_j|^2)^{\frac 12} \leq (h(2C^2h^2+(N-2)C^2h^4))^{\frac 12}\leq 2Ch^{\frac 32} = O(h^\frac 32).
+    \end{equation}
+    同理，可证明
+    \begin{equation}
+        \Vert{\mathbf{g}}\Vert_\infty \geq O(h),\Vert{\mathbf{g}}\Vert_1 \geq O(h^2),\Vert{\mathbf{g}}\Vert_2\geq O(h^{\frac 32})
+    \end{equation}
+    这样就证明了原结论正确。
+\end{proof}
+
+\begin{ex}
+    证明 $B_E = A_E^{-1}$ 的第一列中存在 $O(1)$ 的元素。
+\end{ex}
+
+\begin{proof}
+    依题意，有
+    \begin{equation}
+        A_EB_E = I
+    \end{equation}
+    设 $B_E$ 的第一列为 $\beta_0,\beta_1,\dots,\beta_m,\beta_{m+1}$。比较两端的第一列得线性方程组
+    \begin{equation}
+        \begin{cases}
+            -\beta_0+\beta_1 = h\\
+            \beta_0-2\beta_1+\beta_2 = 0\\
+            \beta_1-2\beta_1+\beta_2 = 0\\
+            \dots\\
+            \beta_{m-1}-2\beta_m+\beta_{m+1} = 0\\
+            \beta_{m+1} = 0\\
+        \end{cases}
+    \end{equation}
+    自下而上将 $\beta_{m-1},\beta_{m-2},\dots,\beta_1,\beta_0$ 都用 $\beta_m$ 表示，得到
+    \begin{equation}
+        \beta_k = (m-k+1)\beta_m
+    \end{equation}
+    代入第一个方程得到 $\beta_m = -h$。
+    因此 $\beta_0 = -(m+1)h = -(1+\dfrac 1m)$。
+    即 $\beta_0 = O(1)$。
+\end{proof}
+
+\begin{ex}
+    证明二维泊松方程的 FD 格式的 LTE $\tau$ 为
+    \begin{equation}
+        \tau_{i,j} = -\dfrac 1{12}h^2(\dfrac{\partial^4u}{\partial x^4}+\dfrac{\partial^4u}{\partial y^4})|_{(x_i,y_j)} + O(h^4).
+    \end{equation}
+\end{ex}
+
+\begin{proof}
+    根据 LTE 的公式，我们有
+    \begin{equation}
+        \begin{split}
+            \tau_{i,j} = &-\dfrac {u(x_{i-1},y_j) - 2u(x_i,y_j) + u(x_{i+1},y_j)}{h^2}\\ &- \dfrac {u(x_i,y_{j-1}) - 2u(x_i,y_j) + u(x_i,y_{j+1})}{h^2}\\ &+ \dfrac{\partial^2u}{\partial x^2}(x_i,y_j) + \dfrac{\partial^2u}{\partial y^2}(x_i,y_j).
+        \end{split}
+    \end{equation}
+    我们将 $u$ 在 $(x_i,y_j)$ 处关于 $x$ 和 $y$ 分别泰勒展开到 6 阶，得
+    \begin{align}
+        u(x_{i-1},y_j) = (u - h\dfrac{\partial u}{\partial x} + \dfrac {h^2}2\dfrac{\partial^2u}{\partial x^2}- \dfrac {h^3}6\dfrac{\partial^3u}{\partial x^3}+ \dfrac {h^4}{24}\dfrac{\partial^4u}{\partial x^4}- \dfrac {h^5}{120}\dfrac{\partial^5u}{\partial x^5}+ \dfrac {h^6}{720}\dfrac{\partial^6u}{\partial x^6})|_{(x_i,y_j)}+ o(h^6)\\
+        u(x_{i+1},y_j) = (u + h\dfrac{\partial u}{\partial x} + \dfrac {h^2}2\dfrac{\partial^2u}{\partial x^2}+ \dfrac {h^3}6\dfrac{\partial^3u}{\partial x^3}+ \dfrac {h^4}{24}\dfrac{\partial^4u}{\partial x^4}+ \dfrac {h^5}{120}\dfrac{\partial^5u}{\partial x^5}+ \dfrac {h^6}{720}\dfrac{\partial^6u}{\partial x^6})|_{(x_i,y_j)}+ o(h^6)\\
+        u(x_i,y_{j-1}) = (u - h\dfrac{\partial u}{\partial y} + \dfrac {h^2}2\dfrac{\partial^2u}{\partial y^2}- \dfrac {h^3}6\dfrac{\partial^3u}{\partial y^3}+ \dfrac {h^4}{24}\dfrac{\partial^4u}{\partial y^4}- \dfrac {h^5}{120}\dfrac{\partial^5u}{\partial y^5}+ \dfrac {h^6}{720}\dfrac{\partial^6u}{\partial y^6})|_{(x_i,y_j)}+ o(h^6)\\
+        u(x_i,y_{j+1}) = (u + h\dfrac{\partial u}{\partial y} + \dfrac {h^2}2\dfrac{\partial^2u}{\partial y^2}+ \dfrac {h^3}6\dfrac{\partial^3u}{\partial y^3}+ \dfrac {h^4}{24}\dfrac{\partial^4u}{\partial y^4}+ \dfrac {h^5}{120}\dfrac{\partial^5u}{\partial y^5}+ \dfrac {h^6}{720}\dfrac{\partial^6u}{\partial y^6})|_{(x_i,y_j)}+ o(h^6)
+    \end{align}
+
+    将上述四个展开式代入，整理得
+    \begin{equation}
+        \tau_{i,j} = -\dfrac 1{12}h^2(\dfrac{\partial^4u}{\partial x^4}+\dfrac{\partial^4u}{\partial y^4})-\dfrac 1{360}h^4(\dfrac{\partial^6u}{\partial x^4}+\dfrac{\partial^6u}{\partial y^6})+o(h^4).
+    \end{equation}
+
+    故待证式成立。
+\end{proof}
+
+\begin{ex}
+    证明：在求解非规则区域上的二阶泊松方程时，非正则点处的 LTE 为 $O(h)$，正则点处的 LTE 为 $O(h^2)$。
+\end{ex}
+
+\begin{proof}
+    根据 LTE 的公式，在正则点处，若它的 Stencil 都是正则点，则有
+    \begin{equation}
+        \begin{split}
+            \tau_{i,j} = &-\dfrac {u(x_{i-1},y_j) - 2u(x_i,y_j) + u(x_{i+1},y_j)}{h^2}\\ &- \dfrac {u(x_i,y_{j-1}) - 2u(x_i,y_j) + u(x_i,y_{j+1})}{h^2}\\ &+ \dfrac{\partial^2u}{\partial x^2}(x_i,y_j) + \dfrac{\partial^2u}{\partial y^2}(x_i,y_j).
+        \end{split}
+    \end{equation}
+    这和规则区域的误差相同，都为 $-\dfrac 1{12}h^2(\dfrac{\partial^4u}{\partial x^4}+\dfrac{\partial^4u}{\partial y^4})|_{(x_i,y_j)} + O(h^4)$。
+
+    若 $x$ 轴方向有一个非正则点，不妨设非正则点在正方向。设其坐标为 $(x_i+\theta h,y_i)$。
+
+    则 $x$ 方向对 LTE 的贡献为
+
+    \begin{equation}
+        \begin{split}
+            & -\dfrac{\theta u(x_i-h,y_j)-(1+\theta)u(x_i,y_j)+u(x_i+\theta h,y_j)}{\dfrac 12 \theta(1+\theta)h^2}+\dfrac {\partial^2 u}{\partial x^2}(x_i,y_j)\\
+            = & (-\dfrac{\theta(u - hu_x + \dfrac{h^2}2 u_{xx} + \dfrac{h^3}6 u_{xxx} + O(h^4)) - (1+\theta)u + (u + \theta h u_x + \dfrac{\theta^2h^2}2 u_{xx} + \dfrac{\theta^3h^3}6 u_{xxx} + O(h^4))}{\dfrac 12 \theta(1+\theta)h^2} \\ & + u_{xx})|_{(x_i,y_j)}\\
+            = & \dfrac {1-\theta}3 hu_{xxx}(x_i,y_j) + O(h^2).
+        \end{split}
+    \end{equation}
+
+    同理可以证明，当 $y$ 轴方向有非正则点时，其 LTE 也为 $O(h)$。特别地，如果 $P$ 点附近边界如 Example 7.59 所示即 $x,y$ 方向都有非正则点，则 LTE 的表达式为
+
+    \begin{equation}
+        \tau_P = (\dfrac {1-\theta}3 hu_{xxx} + \dfrac {1-\alpha}3 hu_{yyy})|_P.
+    \end{equation}
+    
+    综上，若 Stencil 都为正则点，则 LTE 为 $O(h^2)$；否则 LTE 为 $O(h)$。
+\end{proof}
+
+\begin{ex}
+    在 Lem 7.56 中选择适当的 $\psi$ 证明 Thm 7.61。
+\end{ex}
+
+\begin{proof}
+    定义 
+    \begin{equation}
+        \psi : \mathbf{X} \rightarrow \mathbb{R}, \psi_P = E_P + T_m\phi_P
+    \end{equation}
+    其中 $T_m = \max\{\dfrac{T_1}{C_1}, \dfrac{T_2}{C_2}\}$。
+    则当 $P\in \mathbf{X}_1$ 时，
+    \begin{equation}
+        L_h\psi_P = L_h(E_P + T_m\phi_P) \leq T_P - \dfrac{T_1}{C_1} C_1 \leq 0
+    \end{equation}
+    同理 $L_h\psi_P \leq 0, P\in \mathbf{X}_2$。
+    
+    因此 $L_h\psi_P \leq 0, P\in \mathbf{X}$。
+
+    又因为 $\max_{P\in \mathbf{X}}\phi_P\geq 0$，所以 $\max_{P\in \mathbf{X}} \phi_P \geq 0$。再由 $E_Q|_{\mathbf{X}_{\partial\Omega}} = 0$，结合 Lem 7.56 可得
+
+    \begin{equation}
+        E_P\leq \max_{P\in \mathbf{X}}(E_P + T_m\phi_P)\leq \max_{Q\in \mathbf{X}_{\partial\Omega}}{E_Q + T_m\phi_Q} = T_m\max_{Q\in \mathbf{X}_{\partial\Omega}}(\phi_Q).
+    \end{equation}
+
+    因此 $E_P\leq T_m\max_{Q\in \mathbf{X}_{\partial\Omega}}$。
+
+    同理，对 $\psi_P = -E_P + T_m\phi_P$ 作同样处理，则可证明 $-E_P\leq T_m\max_{Q\in \mathbf{X}_{\partial\Omega}}$。
+\end{proof}
+
+\end{document}
