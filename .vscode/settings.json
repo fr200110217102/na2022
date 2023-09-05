@@ -5,6 +5,9 @@
 		"complex": "cpp",
 		"iostream": "cpp",
 		"*.tcc": "cpp",
-		"string": "cpp"
+		"string": "cpp",
+		"new": "cpp",
+		"chrono": "cpp",
+		"iosfwd": "cpp"
 	}
 }

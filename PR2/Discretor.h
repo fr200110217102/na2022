@@ -53,7 +53,6 @@ public:
 		if (Cond_type & 2) Normal_Neumann_Discretor_1D(n, n-1, n-2);
 		else Normal_Dirichlet_Discretor_1D(n);
 		for (int i = 1; i < n; ++ i) Normal_Laplace_Discretor_1D(i, i-1, i+1);
-	//	if (Cond_type == 3) coef[n/2].clear(), coef[n/2][n/2] = 1, rhs[n/2] = 0;
 	}
 };
 
@@ -113,7 +112,6 @@ public:
 		for (int i = 1; i < n; ++ i)
 			for (int j = 1; j < n; ++ j)
 				Normal_Laplace_Discretor_2D(id(i,j), id(i-1,j), id(i+1,j), id(i,j-1), id(i,j+1));
-	//	if (Cond_type == 15) coef[id(n/2,n/2)].clear(), coef[id(n/2,n/2)][id(n/2,n/2)] = 1, rhs[id(n/2,n/2)] = 0;
 	}
 };
 #endif

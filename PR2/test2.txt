@@ -1,0 +1,714 @@
+========================================
+Dimension :2
+Condition :0
+Grid Number : 32
+Restriction : Injection
+Interpolation : Linear
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 9
+Residual Error in L_1 : 1.465e-11
+Residual Error in L_2 : 1.97151e-11
+Residual Error in L_inf : 5.8014e-11
+Solution Error in L_1 : 1.36948e-05
+Solution Error in L_2 : 1.7314e-05
+Solution Error in L_inf : 3.44503e-05
+Run time : 0.049
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 32
+Restriction : Injection
+Interpolation : Linear
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 25
+Residual Error in L_1 : 0.00137883
+Residual Error in L_2 : 0.00149456
+Residual Error in L_inf : 0.00289141
+Solution Error in L_1 : 0.000321843
+Solution Error in L_2 : 0.00038696
+Solution Error in L_inf : 0.000835495
+Run time : 0.136
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 32
+Restriction : Injection
+Interpolation : Linear
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 23
+Residual Error in L_1 : 1.38529e-09
+Residual Error in L_2 : 2.54071e-09
+Residual Error in L_inf : 2.14134e-08
+Solution Error in L_1 : 0.000144231
+Solution Error in L_2 : 0.000181278
+Solution Error in L_inf : 0.000386594
+Run time : 0.135
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Linear
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 11
+Residual Error in L_1 : 5.89774e-10
+Residual Error in L_2 : 7.9437e-10
+Residual Error in L_inf : 2.84694e-09
+Solution Error in L_1 : 1.36948e-05
+Solution Error in L_2 : 1.7314e-05
+Solution Error in L_inf : 3.44503e-05
+Run time : 0.061
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Linear
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 25
+Residual Error in L_1 : 0.00137736
+Residual Error in L_2 : 0.0014947
+Residual Error in L_inf : 0.00292314
+Solution Error in L_1 : 0.000321827
+Solution Error in L_2 : 0.000386944
+Solution Error in L_inf : 0.000836099
+Run time : 0.14
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Linear
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 22
+Residual Error in L_1 : 2.85048e-09
+Residual Error in L_2 : 5.3218e-09
+Residual Error in L_inf : 4.59213e-08
+Solution Error in L_1 : 0.00014423
+Solution Error in L_2 : 0.000181278
+Solution Error in L_inf : 0.000386593
+Run time : 0.12
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 9
+Residual Error in L_1 : 6.22577e-11
+Residual Error in L_2 : 1.22186e-10
+Residual Error in L_inf : 1.09757e-09
+Solution Error in L_1 : 1.36948e-05
+Solution Error in L_2 : 1.7314e-05
+Solution Error in L_inf : 3.44502e-05
+Run time : 0.052
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 23
+Residual Error in L_1 : 0.00138102
+Residual Error in L_2 : 0.00149526
+Residual Error in L_inf : 0.00282005
+Solution Error in L_1 : 0.000321857
+Solution Error in L_2 : 0.000386978
+Solution Error in L_inf : 0.000834572
+Run time : 0.133
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 19
+Residual Error in L_1 : 2.65579e-09
+Residual Error in L_2 : 4.68441e-09
+Residual Error in L_inf : 3.09665e-08
+Solution Error in L_1 : 0.00014423
+Solution Error in L_2 : 0.000181278
+Solution Error in L_inf : 0.000386593
+Run time : 0.105
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 32
+Restriction : Injection
+Interpolation : Linear
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 6
+Residual Error in L_1 : 4.41709e-12
+Residual Error in L_2 : 7.42662e-12
+Residual Error in L_inf : 3.55271e-11
+Solution Error in L_1 : 1.36948e-05
+Solution Error in L_2 : 1.7314e-05
+Solution Error in L_inf : 3.44502e-05
+Run time : 0.055
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 32
+Restriction : Injection
+Interpolation : Linear
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 13
+Residual Error in L_1 : 0.00137002
+Residual Error in L_2 : 0.00149201
+Residual Error in L_inf : 0.00307777
+Solution Error in L_1 : 0.000321783
+Solution Error in L_2 : 0.000386902
+Solution Error in L_inf : 0.000837974
+Run time : 0.113
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 32
+Restriction : Injection
+Interpolation : Linear
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 10
+Residual Error in L_1 : 4.1284e-10
+Residual Error in L_2 : 1.03962e-09
+Residual Error in L_inf : 1.26019e-08
+Solution Error in L_1 : 0.000144231
+Solution Error in L_2 : 0.000181279
+Solution Error in L_inf : 0.000386596
+Run time : 0.08
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Linear
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 6
+Residual Error in L_1 : 1.08938e-11
+Residual Error in L_2 : 1.81619e-11
+Residual Error in L_inf : 7.28289e-11
+Solution Error in L_1 : 1.36948e-05
+Solution Error in L_2 : 1.7314e-05
+Solution Error in L_inf : 3.44502e-05
+Run time : 0.043
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Linear
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 12
+Residual Error in L_1 : 0.00136954
+Residual Error in L_2 : 0.00149196
+Residual Error in L_inf : 0.00308574
+Solution Error in L_1 : 0.000321779
+Solution Error in L_2 : 0.000386897
+Solution Error in L_inf : 0.000838127
+Run time : 0.093
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Linear
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 10
+Residual Error in L_1 : 2.38566e-10
+Residual Error in L_2 : 6.13084e-10
+Residual Error in L_inf : 7.87302e-09
+Solution Error in L_1 : 0.000144231
+Solution Error in L_2 : 0.000181279
+Solution Error in L_inf : 0.000386595
+Run time : 0.074
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 5
+Residual Error in L_1 : 5.90262e-11
+Residual Error in L_2 : 8.70246e-11
+Residual Error in L_inf : 2.94756e-10
+Solution Error in L_1 : 1.36948e-05
+Solution Error in L_2 : 1.7314e-05
+Solution Error in L_inf : 3.44502e-05
+Run time : 0.04
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 10
+Residual Error in L_1 : 0.00137482
+Residual Error in L_2 : 0.00149299
+Residual Error in L_inf : 0.00295193
+Solution Error in L_1 : 0.000321816
+Solution Error in L_2 : 0.000386939
+Solution Error in L_inf : 0.000836254
+Run time : 0.093
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 32
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 9
+Residual Error in L_1 : 9.74312e-11
+Residual Error in L_2 : 2.35368e-10
+Residual Error in L_inf : 2.90968e-09
+Solution Error in L_1 : 0.000144231
+Solution Error in L_2 : 0.000181279
+Solution Error in L_inf : 0.000386595
+Run time : 0.078
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 64
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 9
+Residual Error in L_1 : 1.4052e-10
+Residual Error in L_2 : 2.56011e-10
+Residual Error in L_inf : 2.48352e-09
+Solution Error in L_1 : 3.53575e-06
+Solution Error in L_2 : 4.39626e-06
+Solution Error in L_inf : 8.62414e-06
+Run time : 0.232
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 64
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 23
+Residual Error in L_1 : 0.000377582
+Residual Error in L_2 : 0.000400658
+Residual Error in L_inf : 0.000934609
+Solution Error in L_1 : 7.78779e-05
+Solution Error in L_2 : 9.41418e-05
+Solution Error in L_inf : 0.00020833
+Run time : 0.526
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 64
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 20
+Residual Error in L_1 : 2.25789e-09
+Residual Error in L_2 : 4.12574e-09
+Residual Error in L_inf : 3.90591e-08
+Solution Error in L_1 : 3.68645e-05
+Solution Error in L_2 : 4.59304e-05
+Solution Error in L_inf : 9.77634e-05
+Run time : 0.495
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 64
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 5
+Residual Error in L_1 : 2.16258e-11
+Residual Error in L_2 : 3.46023e-11
+Residual Error in L_inf : 1.42318e-10
+Solution Error in L_1 : 3.53575e-06
+Solution Error in L_2 : 4.39626e-06
+Solution Error in L_inf : 8.62414e-06
+Run time : 0.172
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 64
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 10
+Residual Error in L_1 : 0.000376356
+Residual Error in L_2 : 0.000400778
+Residual Error in L_inf : 0.000990388
+Solution Error in L_1 : 7.78726e-05
+Solution Error in L_2 : 9.41338e-05
+Solution Error in L_inf : 0.000207948
+Run time : 0.327
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 64
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 8
+Residual Error in L_1 : 2.31817e-10
+Residual Error in L_2 : 6.57424e-10
+Residual Error in L_inf : 1.42492e-08
+Solution Error in L_1 : 3.68652e-05
+Solution Error in L_2 : 4.59313e-05
+Solution Error in L_inf : 9.77655e-05
+Run time : 0.243
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 128
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 10
+Residual Error in L_1 : 2.72759e-11
+Residual Error in L_2 : 3.87765e-11
+Residual Error in L_inf : 3.08545e-10
+Solution Error in L_1 : 8.9807e-07
+Solution Error in L_2 : 1.10766e-06
+Solution Error in L_inf : 2.15645e-06
+Run time : 1.214
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 128
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 24
+Residual Error in L_1 : 9.91736e-05
+Residual Error in L_2 : 0.000104574
+Residual Error in L_inf : 0.000310273
+Solution Error in L_1 : 1.9152e-05
+Solution Error in L_2 : 2.32332e-05
+Solution Error in L_inf : 5.32415e-05
+Run time : 2.647
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 128
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 21
+Residual Error in L_1 : 1.77254e-09
+Residual Error in L_2 : 3.38231e-09
+Residual Error in L_inf : 4.73726e-08
+Solution Error in L_1 : 9.31263e-06
+Solution Error in L_2 : 1.15545e-05
+Solution Error in L_inf : 2.45876e-05
+Run time : 2.107
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 128
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 5
+Residual Error in L_1 : 1.81841e-11
+Residual Error in L_2 : 2.49337e-11
+Residual Error in L_inf : 1.53586e-10
+Solution Error in L_1 : 8.9807e-07
+Solution Error in L_2 : 1.10766e-06
+Solution Error in L_inf : 2.15645e-06
+Run time : 0.71
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 128
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 11
+Residual Error in L_1 : 9.89568e-05
+Residual Error in L_2 : 0.000104734
+Residual Error in L_inf : 0.000331964
+Solution Error in L_1 : 1.91512e-05
+Solution Error in L_2 : 2.32316e-05
+Solution Error in L_inf : 5.31629e-05
+Run time : 1.522
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 128
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 8
+Residual Error in L_1 : 7.03656e-11
+Residual Error in L_2 : 2.0167e-10
+Residual Error in L_inf : 7.81552e-09
+Solution Error in L_1 : 9.31311e-06
+Solution Error in L_2 : 1.15551e-05
+Solution Error in L_inf : 2.4589e-05
+Run time : 1.086
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 256
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 10
+Residual Error in L_1 : 9.74256e-11
+Residual Error in L_2 : 1.36321e-10
+Residual Error in L_inf : 1.00679e-09
+Solution Error in L_1 : 2.26292e-07
+Solution Error in L_2 : 2.77997e-07
+Solution Error in L_inf : 5.39132e-07
+Run time : 4.352
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 256
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 25
+Residual Error in L_1 : 2.54874e-05
+Residual Error in L_2 : 2.6879e-05
+Residual Error in L_inf : 0.000103146
+Solution Error in L_1 : 4.74911e-06
+Solution Error in L_2 : 5.77234e-06
+Solution Error in L_inf : 1.3459e-05
+Run time : 10.36
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 256
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 22
+Residual Error in L_1 : 1.34681e-09
+Residual Error in L_2 : 2.62054e-09
+Residual Error in L_inf : 5.54228e-08
+Solution Error in L_1 : 2.33978e-06
+Solution Error in L_2 : 2.89709e-06
+Solution Error in L_inf : 6.16526e-06
+Run time : 8.824
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 256
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 5
+Residual Error in L_1 : 5.77255e-11
+Residual Error in L_2 : 7.9967e-11
+Residual Error in L_inf : 5.98161e-10
+Solution Error in L_1 : 2.26292e-07
+Solution Error in L_2 : 2.77997e-07
+Solution Error in L_inf : 5.39132e-07
+Run time : 2.643
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 256
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 11
+Residual Error in L_1 : 2.54515e-05
+Residual Error in L_2 : 2.69374e-05
+Residual Error in L_inf : 0.000111157
+Solution Error in L_1 : 4.74897e-06
+Solution Error in L_2 : 5.77206e-06
+Solution Error in L_inf : 1.34438e-05
+Run time : 5.68
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 256
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 7
+Residual Error in L_1 : 1.97072e-10
+Residual Error in L_2 : 5.79137e-10
+Residual Error in L_inf : 3.87863e-08
+Solution Error in L_1 : 2.34015e-06
+Solution Error in L_2 : 2.89756e-06
+Solution Error in L_inf : 6.16637e-06
+Run time : 3.567
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 512
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 10
+Residual Error in L_1 : 3.81729e-10
+Residual Error in L_2 : 5.27161e-10
+Residual Error in L_inf : 4.92213e-09
+Solution Error in L_1 : 5.67952e-08
+Solution Error in L_2 : 6.9635e-08
+Solution Error in L_inf : 1.34786e-07
+Run time : 16.465
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 512
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 25
+Residual Error in L_1 : 6.47196e-06
+Residual Error in L_2 : 6.84374e-06
+Residual Error in L_inf : 3.43894e-05
+Solution Error in L_1 : 1.18253e-06
+Solution Error in L_2 : 1.43872e-06
+Solution Error in L_inf : 3.38347e-06
+Run time : 46.037
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 512
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : V_cycle
+Iteration times : 5, 5
+Cycle times : 22
+Residual Error in L_1 : 2.76324e-09
+Residual Error in L_2 : 5.36655e-09
+Residual Error in L_inf : 1.72326e-07
+Solution Error in L_1 : 5.85867e-07
+Solution Error in L_2 : 7.24653e-07
+Solution Error in L_inf : 1.54211e-06
+Run time : 52.352
+========================================
+========================================
+Dimension :2
+Condition :0
+Grid Number : 512
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 5
+Residual Error in L_1 : 2.06959e-10
+Residual Error in L_2 : 2.84184e-10
+Residual Error in L_inf : 2.01159e-09
+Solution Error in L_1 : 5.67952e-08
+Solution Error in L_2 : 6.9635e-08
+Solution Error in L_inf : 1.34786e-07
+Run time : 11.641
+========================================
+========================================
+Dimension :2
+Condition :15
+Grid Number : 512
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 11
+Residual Error in L_1 : 6.46625e-06
+Residual Error in L_2 : 6.86003e-06
+Residual Error in L_inf : 3.71856e-05
+Solution Error in L_1 : 1.18245e-06
+Solution Error in L_2 : 1.43867e-06
+Solution Error in L_inf : 3.38077e-06
+Run time : 29.175
+========================================
+========================================
+Dimension :2
+Condition :3
+Grid Number : 512
+Restriction : Full Weighting
+Interpolation : Quadratic
+Cycle : FMG
+Iteration times : 5, 5
+Cycle times : 7
+Residual Error in L_1 : 3.30131e-10
+Residual Error in L_2 : 4.65282e-10
+Residual Error in L_inf : 2.19128e-08
+Solution Error in L_1 : 5.86501e-07
+Solution Error in L_2 : 7.25464e-07
+Solution Error in L_inf : 1.544e-06
+Run time : 16.966
+========================================

@@ -40,16 +40,16 @@ public:
 	}
 };
 
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
 	int n = atoi(argv[1]);
 	const Restriction_method i1 = string(argv[2]) == "I" ? Injection : Full_Weighting;
 	const Interpolation_method i2 = string(argv[3]) == "L" ? Linear : Quadratic;
 	const Cycle_method i3 = string(argv[4]) == "V" ? V_cycle : FMG;
 	int T1 = atoi(argv[5]), T2 = atoi(argv[6]);
-	auto Solver_D = Multigrid<2, 0>(F(u), G<0>(u), i1, i2, i3);
-	Solver_D.Solve(n, T1, T2, 1e-8, 1, u);
-	auto Solver_N = Multigrid<2, 15>(F(u), G<15>(u), i1, i2, i3);
-	Solver_N.Solve(n, T1, T2, 1e-8, 1, u);
-	auto Solver_M = Multigrid<2, 3>(F(u), G<3>(u), i1, i2, i3);
-	Solver_M.Solve(n, T1, T2, 1e-8, 1, u);
+	auto Solver_D = Multigrid<2, 0>(F(u), G<0>(u));
+	Solver_D.Solve(n, i1, i2, i3, T1, T2, 1e-8, 1, u);
+	auto Solver_N = Multigrid<2, 15>(F(u), G<15>(u));
+	Solver_N.Solve(n, i1, i2, i3, T1, T2, 1e-8, 1, u);
+	auto Solver_M = Multigrid<2, 3>(F(u), G<3>(u));
+	Solver_M.Solve(n, i1, i2, i3, T1, T2, 1e-8, 1, u);
 }
